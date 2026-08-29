@@ -19,7 +19,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" data-text-size="normal">
+    <html lang="en" dir="ltr" data-text-size="standard">
       <body>
         <ProfileProvider>
           <ServiceWorker />

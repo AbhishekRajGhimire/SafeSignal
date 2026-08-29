@@ -20,11 +20,30 @@ const response = {
       polygons: [],
       officialUrl: 'https://example.invalid',
       rawAdvice: null,
+      fields: {},
+      raw: { properties: {}, geometry: null },
+      provenance: {
+        source: 'nsw-rfs',
+        sourceName: 'NSW Rural Fire Service',
+        feedUrl: 'https://www.rfs.nsw.gov.au/feeds/majorIncidents.json',
+        copyright: 'State of New South Wales (NSW Rural Fire Service)',
+        retrievedAt: '2026-08-29T12:00:00.000Z',
+        feedLastModified: null,
+        transform: 'normalized',
+      },
     },
   ],
   fetchedAt: '2026-08-29T12:00:00.000Z',
   stale: false,
   dropped: 0,
+  duplicates: 0,
+  failure: null,
+}
+
+/** The same incident, escalated, for lifecycle assertions. */
+const escalated = {
+  ...response,
+  warnings: [{ ...response.warnings[0], level: 'watch-and-act' }],
 }
 
 beforeEach(() => vi.useFakeTimers())
@@ -105,5 +124,99 @@ describe('LiveSource', () => {
     expect(received[0].warnings).toEqual([])
     expect(received[0].stale).toBe(true)
     unsubscribe()
+  })
+})
+
+describe('LiveSource lifecycle events', () => {
+  it('reports no changes on the first emission, which is a baseline', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => response }))
+    const received: WarningFeed[] = []
+    const source = new LiveSource(60_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    stop()
+    expect(received[0].changes).toEqual([])
+  })
+
+  it('reports a level change between polls', async () => {
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => response })
+      .mockResolvedValueOnce({ ok: true, json: async () => escalated })
+    vi.stubGlobal('fetch', spy)
+    const received: WarningFeed[] = []
+    const source = new LiveSource(1_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    await vi.advanceTimersByTimeAsync(1_000)
+    stop()
+    expect(received[1].changes).toEqual([
+      { kind: 'level-changed', id: 'incident-1', from: 'advice', to: 'watch-and-act', escalated: true },
+    ])
+  })
+
+  it('reports a cancellation when a warning leaves the feed', async () => {
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => response })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ ...response, warnings: [] }) })
+    vi.stubGlobal('fetch', spy)
+    const received: WarningFeed[] = []
+    const source = new LiveSource(1_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    await vi.advanceTimersByTimeAsync(1_000)
+    stop()
+    expect(received[1].changes).toEqual([
+      { kind: 'cancelled', id: 'incident-1', lastLevel: 'advice' },
+    ])
+  })
+
+  it('claims no changes when it simply could not reach the feed', async () => {
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => response })
+      .mockRejectedValueOnce(new Error('offline'))
+    vi.stubGlobal('fetch', spy)
+    const received: WarningFeed[] = []
+    const source = new LiveSource(1_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    await vi.advanceTimersByTimeAsync(1_000)
+    stop()
+    // An unreachable feed is not evidence that anything was cancelled.
+    expect(received[1].changes).toEqual([])
+    expect(received[1].failure).toBe('network')
+    expect(received[1].warnings).toHaveLength(1)
+  })
+})
+
+describe('the previous snapshot travels with the changes', () => {
+  it('is empty on the baseline emission', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => response }))
+    const received: WarningFeed[] = []
+    const source = new LiveSource(60_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    stop()
+    expect(received[0].previous).toEqual([])
+  })
+
+  it('carries the warnings the diff was computed against', async () => {
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => response })
+      .mockResolvedValueOnce({ ok: true, json: async () => escalated })
+    vi.stubGlobal('fetch', spy)
+    const received: WarningFeed[] = []
+    const source = new LiveSource(1_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    await vi.advanceTimersByTimeAsync(1_000)
+    stop()
+    // The second emission's previous is the first emission's warnings, so a
+    // consumer can say "changed from Advice" rather than only "changed".
+    expect(received[1].previous.map((w) => w.level)).toEqual(['advice'])
+    expect(received[1].warnings.map((w) => w.level)).toEqual(['watch-and-act'])
   })
 })

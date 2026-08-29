@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { buildShareMessage, shareSituation } from './share'
 import { DEFAULT_PROFILE, type UserProfile } from '@/lib/domain/profile'
 import type { RelevantWarning } from '@/lib/domain/match'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const profile = (overrides: Partial<UserProfile> = {}): UserProfile => ({
   ...DEFAULT_PROFILE,
@@ -26,10 +27,16 @@ const relevant: RelevantWarning = {
     polygons: [],
     officialUrl: 'https://example.invalid',
     rawAdvice: null,
+    fields: {},
+    raw: { properties: {}, geometry: null },
+    provenance: makeWarning().provenance,
   },
   distanceKm: 2.1,
   inside: false,
   band: 'very-close',
+  verdict: 'not-currently-affected' as const,
+  reason: 'outside-polygon' as const,
+  rejectedRings: 0,
 }
 
 afterEach(() => vi.unstubAllGlobals())
@@ -44,17 +51,17 @@ describe('buildShareMessage', () => {
 
   it('states the needs that make evacuation harder', () => {
     const message = buildShareMessage(
-      profile({ mobility: 'wheelchair', transport: 'no-transport' }),
+      profile({ needs: ['mobility'], transport: 'needs-assistance' }),
       relevant,
     )
-    expect(message).toContain('wheelchair')
-    expect(message).toContain('no transport')
+    expect(message).toContain('I need help to move around')
+    expect(message).toContain('I need someone to help me leave')
   })
 
   it('omits need lines when there are none', () => {
-    const message = buildShareMessage(profile({ mobility: 'none', transport: 'own-car' }), relevant)
-    expect(message).not.toContain('wheelchair')
-    expect(message).not.toContain('no transport')
+    const message = buildShareMessage(profile({ needs: [], transport: 'car' }), relevant)
+    expect(message).not.toContain('help to move around')
+    expect(message).not.toContain('help me leave')
   })
 
   it('still produces a usable message with no warning', () => {

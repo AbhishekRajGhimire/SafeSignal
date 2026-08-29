@@ -1,6 +1,6 @@
 import type { RelevantWarning } from '@/lib/domain/match'
 import type { LanguageCode } from '@/lib/domain/profile'
-import { getPack, SPEECH_LOCALE } from './index'
+import { getPack, speechLocaleOf } from './index'
 
 export interface RenderedWarning {
   /** The official label, which may be unfamiliar. */
@@ -40,7 +40,7 @@ const OFFICIAL_LEVEL: Record<string, string> = {
 const timeFormatters = new Map<string, Intl.DateTimeFormat>()
 
 function sydneyTimeFor(language: LanguageCode): Intl.DateTimeFormat {
-  const locale = SPEECH_LOCALE[language]
+  const locale = speechLocaleOf(language)
   let formatter = timeFormatters.get(locale)
   if (!formatter) {
     formatter = new Intl.DateTimeFormat(locale, {
@@ -56,18 +56,32 @@ function sydneyTimeFor(language: LanguageCode): Intl.DateTimeFormat {
   return formatter
 }
 
-/** Rebuilds the official English text so it can sit under the translation. */
+/**
+ * The official English text, shown verbatim beneath the translation.
+ *
+ * Every field the feed sent is emitted, in the order the feed sent it. The
+ * previous implementation rebuilt this from a fixed list of seven keys, which
+ * silently dropped the feed's `FIRE` field and would drop any field the RFS
+ * adds in future. Preserving the official content means preserving all of it.
+ */
 function buildOfficialText(relevant: RelevantWarning): string {
   const w = relevant.warning
-  const lines = [
-    `ALERT LEVEL: ${OFFICIAL_LEVEL[w.level] ?? w.level}`,
-    w.location ? `LOCATION: ${w.location}` : null,
-    w.council ? `COUNCIL AREA: ${w.council}` : null,
-    w.status ? `STATUS: ${w.status}` : null,
-    w.type ? `TYPE: ${w.type}` : null,
-    w.sizeHa !== null ? `SIZE: ${w.sizeHa} ha` : null,
-    w.agency ? `RESPONSIBLE AGENCY: ${w.agency}` : null,
-  ].filter((line): line is string => line !== null)
+  const entries = Object.entries(w.fields)
+
+  const lines =
+    entries.length > 0
+      ? entries.map(([key, value]) => `${key}: ${value}`)
+      : // Fallback for warnings that did not come from the feed, such as the
+        // demo scenario, which carries no parsed description.
+        [
+          `ALERT LEVEL: ${OFFICIAL_LEVEL[w.level] ?? w.level}`,
+          w.location ? `LOCATION: ${w.location}` : null,
+          w.council ? `COUNCIL AREA: ${w.council}` : null,
+          w.status ? `STATUS: ${w.status}` : null,
+          w.type ? `TYPE: ${w.type}` : null,
+          w.sizeHa !== null ? `SIZE: ${w.sizeHa} ha` : null,
+          w.agency ? `RESPONSIBLE AGENCY: ${w.agency}` : null,
+        ].filter((line): line is string => line !== null)
 
   if (w.rawAdvice) lines.push('', w.rawAdvice)
   return lines.join('\n')
@@ -113,6 +127,6 @@ export function renderWarning(
     speechText: [levelMeaning, w.location, statusText, levelAction]
       .filter(Boolean)
       .join(' '),
-    speechLocale: SPEECH_LOCALE[language],
+    speechLocale: speechLocaleOf(language),
   }
 }

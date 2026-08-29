@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest'
 import { buildCallScript } from './callScript'
-import { DEFAULT_PROFILE, type UserProfile } from '@/lib/domain/profile'
+import {
+  ACCESSIBILITY_NEEDS,
+  DEFAULT_PROFILE,
+  LANGUAGE_CODES,
+  TRANSPORTS,
+  type UserProfile,
+} from '@/lib/domain/profile'
 import type { Warning } from '@/lib/domain/warning'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const katoomba = { lat: -33.7128, lon: 150.3119, label: 'Katoomba' }
 
@@ -27,12 +34,15 @@ const warning: Warning = {
   polygons: [],
   officialUrl: 'https://example.invalid',
   rawAdvice: null,
+  fields: {},
+  raw: { properties: {}, geometry: null },
+  provenance: makeWarning().provenance,
 }
 
 describe('buildCallScript', () => {
   it('produces the same number of lines in both languages', () => {
     const script = buildCallScript(
-      profile({ language: 'zh', mobility: 'wheelchair', transport: 'no-transport' }),
+      profile({ language: 'zh', needs: ['mobility'], transport: 'needs-assistance' }),
       warning,
       'evacuate',
     )
@@ -40,17 +50,17 @@ describe('buildCallScript', () => {
     expect(script.english.length).toBeGreaterThan(3)
   })
 
-  it('states the need, the place, the mobility, and the transport situation', () => {
+  it('states the need, the place, the accessibility need, and the transport situation', () => {
     const script = buildCallScript(
-      profile({ mobility: 'wheelchair', transport: 'no-transport' }),
+      profile({ needs: ['mobility'], transport: 'needs-assistance' }),
       warning,
       'evacuate',
     )
     const text = script.english.join(' ')
     expect(text).toContain('I need help to leave my home')
     expect(text).toContain('Katoomba')
-    expect(text).toContain('I use a wheelchair')
-    expect(text).toContain('I do not have any transport')
+    expect(text).toContain('I need help to move around')
+    expect(text).toContain('I need someone to help me leave')
   })
 
   it('asks for an interpreter only when the user does not speak English', () => {
@@ -79,7 +89,7 @@ describe('buildCallScript', () => {
 
   it('translates every line for a Vietnamese speaker', () => {
     const script = buildCallScript(
-      profile({ language: 'vi', mobility: 'bedbound', transport: 'no-transport' }),
+      profile({ language: 'vi', needs: ['mobility'], transport: 'needs-assistance' }),
       warning,
       'check-on-me',
     )
@@ -110,12 +120,73 @@ describe('buildCallScript', () => {
 
   it('omits mobility and transport sentences when neither is a barrier', () => {
     const script = buildCallScript(
-      profile({ mobility: 'none', transport: 'own-car' }),
+      profile({ needs: [], transport: 'car' }),
       warning,
       'information',
     )
     const text = script.english.join(' ')
     expect(text).not.toContain('wheelchair')
     expect(text).not.toContain('do not have any transport')
+  })
+})
+
+describe('coverage of the new profile options', () => {
+  it('produces a line for every accessibility need, in every language', () => {
+    const expected: Record<string, string> = {
+      mobility: 'I need help to move around',
+      'low-vision': 'I have low vision',
+      hearing: 'I have difficulty hearing',
+      cognitive: 'speak slowly',
+      simpler: 'simple words',
+    }
+    for (const need of ACCESSIBILITY_NEEDS) {
+      for (const language of LANGUAGE_CODES) {
+        const script = buildCallScript(
+          profile({ needs: [need], language }),
+          warning,
+          'evacuate',
+        )
+        expect(script.english.join(' '), `${need}/${language}`).toContain(expected[need])
+        // Both columns always have the same number of sentences, so the
+        // caller can follow along line by line.
+        expect(script.translated.length, `${need}/${language}`).toBe(script.english.length)
+        for (const line of script.translated) {
+          expect(line.length, `${need}/${language}`).toBeGreaterThan(0)
+        }
+      }
+    }
+  })
+
+  it('states the transport situation for every answer except having a car', () => {
+    for (const transport of TRANSPORTS) {
+      const script = buildCallScript(profile({ transport }), warning, 'evacuate')
+      const text = script.english.join(' ')
+      if (transport === 'car') {
+        expect(text, transport).not.toContain('I do not have a car')
+        expect(text, transport).not.toContain('help me leave')
+      } else {
+        expect(script.english.length, transport).toBeGreaterThan(3)
+      }
+    }
+  })
+
+  it('leaves no placeholder unfilled in any language', () => {
+    for (const language of LANGUAGE_CODES) {
+      const script = buildCallScript(
+        profile({ language, needs: [...ACCESSIBILITY_NEEDS], transport: 'unsure' }),
+        warning,
+        'evacuate',
+      )
+      for (const line of [...script.english, ...script.translated]) {
+        expect(line, `${language}: ${line}`).not.toMatch(/\{\w+\}/)
+      }
+    }
+  })
+
+  it('asks for an interpreter when the language is not listed, without naming it', () => {
+    const script = buildCallScript(profile({ language: 'other' }), warning, 'evacuate')
+    const text = script.english.join(' ')
+    expect(text).toContain('Please connect me to an interpreter')
+    expect(text).toContain('a language not listed here')
   })
 })

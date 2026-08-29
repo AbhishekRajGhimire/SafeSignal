@@ -1,24 +1,18 @@
 import { describe, it, expect } from 'vitest'
 import { buildChecklist } from './checklist'
 import type { Warning } from '@/lib/domain/warning'
+import { makeWarning } from '@/lib/testing/fixtures'
 
-const warning = (rawAdvice: string | null): Warning => ({
-  id: 'demo',
-  level: 'emergency-warning',
-  title: 'T',
-  location: 'L',
-  council: 'C',
-  status: 'Out of control',
-  type: 'Bush Fire',
-  sizeHa: 1,
-  agency: 'Rural Fire Service',
-  updatedAt: null,
-  publishedAt: null,
-  point: null,
-  polygons: [],
-  officialUrl: 'https://example.invalid',
-  rawAdvice,
-})
+const warning = (rawAdvice: string | null): Warning =>
+  makeWarning({
+    id: 'demo',
+    level: 'emergency-warning',
+    updatedAt: null,
+    publishedAt: null,
+    point: null,
+    officialUrl: 'https://example.invalid',
+    rawAdvice,
+  })
 
 describe('buildChecklist', () => {
   it('leads with the plain-language action, marked as SafeSignal wording', () => {

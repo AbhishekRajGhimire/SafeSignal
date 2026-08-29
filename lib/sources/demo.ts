@@ -1,4 +1,6 @@
 import type { ScenarioStep } from './scenario'
+import { diffWarnings } from '@/lib/domain/lifecycle'
+import type { Warning } from '@/lib/domain/warning'
 import type { WarningFeed, WarningSource } from './types'
 
 export interface DemoState {
@@ -12,6 +14,9 @@ export class DemoSource implements WarningSource {
   private playing = false
   private timer: ReturnType<typeof setTimeout> | null = null
   private readonly feedListeners = new Set<(feed: WarningFeed) => void>()
+  /** Previous step's warnings, so the demo emits real lifecycle changes. */
+  private previous: Warning[] = []
+  private emitted = false
   private readonly stateListeners = new Set<(state: DemoState) => void>()
 
   constructor(private readonly steps: ScenarioStep[]) {}
@@ -51,6 +56,8 @@ export class DemoSource implements WarningSource {
   restart(): void {
     this.pause()
     this.stepIndex = 0
+    this.previous = []
+    this.emitted = false
     this.emitFeed()
     this.emitState()
   }
@@ -95,11 +102,29 @@ export class DemoSource implements WarningSource {
     }
   }
 
+  /**
+   * Demo mode runs the same diff engine as live mode, so the escalation
+   * produces genuine level-changed events rather than a scripted animation.
+   */
   private currentFeed(): WarningFeed {
+    const step = this.steps[this.stepIndex]
+    const warnings = step?.warnings ?? []
+    const previous = this.emitted ? this.previous : []
+    const changes = this.emitted ? diffWarnings(previous, warnings) : []
+    this.previous = warnings
+    this.emitted = true
     return {
-      warnings: this.steps[this.stepIndex]?.warnings ?? [],
+      warnings,
       fetchedAt: new Date(),
-      stale: false,
+      // A scenario may simulate the feed itself degrading, so the stale and
+      // error screens can be rehearsed without unplugging anything.
+      stale: step?.feedState?.stale ?? false,
+      freshness: step?.feedState?.freshness ?? 'fresh',
+      changes,
+      previous,
+      failure: step?.feedState?.failure ?? null,
+      dropped: 0,
+      duplicates: 0,
     }
   }
 

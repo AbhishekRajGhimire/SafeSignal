@@ -4,16 +4,30 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { useProfile, usePack } from '@/components/ProfileProvider'
 import { useWarnings } from '@/components/WarningProvider'
-import { WarningCard } from '@/components/WarningCard'
+import { EmergencyWarning } from '@/components/warning/EmergencyWarning'
+import { WarningSummary } from '@/components/warning/WarningSummary'
+import {
+  FeedErrorPanel,
+  LoadingPanel,
+  LocationErrorPanel,
+  NoWarningPanel,
+  StaleDataPanel,
+} from '@/components/warning/StatePanel'
 import { DemoControls } from '@/components/DemoControls'
-import { matchWarnings } from '@/lib/domain/match'
+import { assess } from '@/lib/domain/match'
+import { screenStateFrom, isEscalation } from '@/lib/domain/screenState'
+import { summariseWarningChange } from '@/lib/domain/changeSummary'
+import { WhatChanged } from '@/components/warning/WhatChanged'
 import { renderWarning } from '@/lib/i18n/render'
-import { speak } from '@/lib/speech/tts'
-import { SPEECH_LOCALE } from '@/lib/i18n'
+import { getSpeechEngine } from '@/lib/speech/tts'
+import { speechLocaleOf } from '@/lib/i18n'
+import type { LanguageCode } from '@/lib/domain/profile'
 
-// Formatted in the user's language, not en-GB.
-const clockFor = (language: keyof typeof SPEECH_LOCALE) =>
-  new Intl.DateTimeFormat(SPEECH_LOCALE[language], {
+// Formatted in the user's language, not en-GB. Uses speechLocaleOf rather
+// than indexing SPEECH_LOCALE directly so a language with no pack of its
+// own still resolves to a real locale.
+const clockFor = (language: LanguageCode) =>
+  new Intl.DateTimeFormat(speechLocaleOf(language), {
     timeZone: 'Australia/Sydney',
     hour: '2-digit',
     minute: '2-digit',
@@ -23,10 +37,18 @@ const clockFor = (language: keyof typeof SPEECH_LOCALE) =>
 export default function Home() {
   const { profile, ready } = useProfile()
   const pack = usePack()
-  const { feed, demo, demoState, demoMode, setDemoMode } = useWarnings()
+  const { feed, demoMode, setDemoMode } = useWarnings()
 
-  const relevant = matchWarnings(feed.warnings, profile.location)
-  const top = relevant[0] ?? null
+  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  const state = screenStateFrom({
+    ready,
+    hasLocation: profile.location !== null,
+    assessment,
+    changes: feed.changes,
+    failure: feed.failure,
+  })
+
+  const top = assessment.affected[0] ?? null
   const topId = top?.warning.id ?? null
   const topLevel = top?.warning.level ?? null
 
@@ -35,19 +57,25 @@ export default function Home() {
   useEffect(() => {
     if (!profile.audio || !top) return
     const view = renderWarning(top, profile.language)
-    void speak(view.speechText, view.speechLocale)
+    getSpeechEngine()?.speak(view.speechText, view.speechLocale)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topId, topLevel, profile.audio, profile.language])
 
-  if (!ready) return <main><p>...</p></main>
+  if (state === 'loading') {
+    return (
+      <main className="screen">
+        <LoadingPanel />
+      </main>
+    )
+  }
 
   // Demo mode bypasses the setup gate on purpose. Someone opening the shared
   // link cold must land on the scenario, not on a settings wizard.
   if (!profile.completedSetup && !demoMode) {
     return (
-      <main className="stack">
+      <main className="screen screen--intro">
         <h1>SafeSignal</h1>
-        <p>{pack.ui.setupIntro}</p>
+        <p className="lede">{pack.ui.setupIntro}</p>
         <Link className="button" href="/setup">{pack.ui.saveAndContinue}</Link>
         <button
           type="button"
@@ -60,41 +88,75 @@ export default function Home() {
     )
   }
 
+  const emergency = state === 'warning' || state === 'warning-updated'
+  const others = assessment.all.filter((r) => r.verdict !== 'affected')
+
   return (
     <>
       {demoMode && <div className="banner banner--demo">{pack.ui.demoBanner}</div>}
-      {feed.stale && <div className="banner banner--offline">{pack.ui.offlineNotice}</div>}
 
-      <main>
-        <h1>{pack.ui.yourArea}</h1>
-        <p className="muted">{profile.location?.label ?? ''}</p>
-
-        {demo && demoState && <DemoControls demo={demo} state={demoState} />}
-
-        {relevant.length === 0 ? (
-          <div className="card">
-            <h2>{pack.ui.noWarningsTitle}</h2>
-            <p>{pack.ui.noWarningsBody}</p>
-          </div>
-        ) : (
-          relevant.map((item) => <WarningCard key={item.warning.id} relevant={item} />)
+      <main className={`screen${emergency ? ' screen--emergency' : ''}`} id="main">
+        {/* The change summary is the one interruption the screen allows.
+            It says what changed; it never says what to do about it. */}
+        {state === 'warning-updated' && top && (
+          <WhatChanged
+            details={summariseWarningChange(
+              feed.previous.find((w) => w.id === top.warning.id),
+              top.warning,
+            )}
+            assertive={isEscalation(feed.changes)}
+          />
         )}
 
-        {/* Freshness is never optional: silent staleness is the dangerous failure. */}
-        <p className="muted">
-          {pack.ui.dataAsOf} {feed.fetchedAt ? clockFor(profile.language).format(feed.fetchedAt) : '-'}
-        </p>
+        {emergency && top ? (
+          assessment.affected.map((item) => (
+            <EmergencyWarning key={item.warning.id} relevant={item} />
+          ))
+        ) : (
+          <>
+            <header className="screen__head">
+              <h1>{pack.ui.yourArea}</h1>
+              {profile.location && <p className="lede">{profile.location.label}</p>}
+            </header>
 
-        <div className="stack">
-          <Link className="button button--secondary" href="/setup">{pack.ui.changeSettings}</Link>
-          <button
-            type="button"
-            className="button button--secondary"
-            onClick={() => setDemoMode(!demoMode)}
-          >
-            {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
-          </button>
-        </div>
+            {state === 'no-warning' && <NoWarningPanel />}
+            {state === 'stale-data' && <StaleDataPanel />}
+            {state === 'feed-error' && <FeedErrorPanel />}
+            {state === 'location-error' && <LocationErrorPanel />}
+          </>
+        )}
+
+        {others.length > 0 && (
+          <section className="others">
+            <h2 className="others__title">{pack.ui.otherWarnings}</h2>
+            {others.map((item) => (
+              <WarningSummary key={item.warning.id} relevant={item} />
+            ))}
+          </section>
+        )}
+
+        {demoMode && <DemoControls />}
+
+        {/* Freshness is never optional: silent staleness is the dangerous
+            failure, so it sits on every screen regardless of state. */}
+        <footer className="screen__foot">
+          <p className="muted">
+            {pack.ui.dataAsOf} {feed.fetchedAt ? clockFor(profile.language).format(feed.fetchedAt) : '-'}
+          </p>
+          <p className="muted">{pack.ui.sourceRfs}</p>
+          <div className="screen__actions">
+            <Link className="button button--secondary" href="/setup">
+              {pack.ui.changeSettings}
+            </Link>
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={() => setDemoMode(!demoMode)}
+            >
+              {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
+            </button>
+          </div>
+        </footer>
       </main>
     </>
   )

@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { SERVICES, rankServices } from './services'
-import { LANGUAGE_CODES, DEFAULT_PROFILE, type UserProfile } from '@/lib/domain/profile'
+import {
+  LANGUAGE_CODES,
+  PACK_LANGUAGES,
+  DEFAULT_PROFILE,
+  type UserProfile,
+} from '@/lib/domain/profile'
 
 const profile = (overrides: Partial<UserProfile> = {}): UserProfile => ({
   ...DEFAULT_PROFILE,
@@ -8,9 +13,9 @@ const profile = (overrides: Partial<UserProfile> = {}): UserProfile => ({
 })
 
 describe('SERVICES', () => {
-  it('describes every service in every supported language', () => {
+  it('describes every service in every language that has a pack', () => {
     for (const service of SERVICES) {
-      for (const code of LANGUAGE_CODES) {
+      for (const code of PACK_LANGUAGES) {
         expect(service.descriptions[code], `${service.id}.${code}`).toBeTruthy()
       }
     }
@@ -61,12 +66,12 @@ describe('rankServices', () => {
     const ranked = rankServices({
       level: 'watch-and-act',
       inside: false,
-      profile: profile({ mobility: 'wheelchair', transport: 'no-transport' }),
+      profile: profile({ needs: ['mobility'], transport: 'needs-assistance' }),
     })
     const withCar = rankServices({
       level: 'watch-and-act',
       inside: false,
-      profile: profile({ mobility: 'none', transport: 'own-car' }),
+      profile: profile({ needs: [], transport: 'car' }),
     })
     expect(ranked.findIndex((s) => s.id === 'service-nsw'))
       .toBeLessThan(withCar.findIndex((s) => s.id === 'service-nsw'))
@@ -77,7 +82,7 @@ describe('rankServices', () => {
     const ranked = rankServices({
       level: 'emergency-warning',
       inside: false,
-      profile: profile({ language: 'zh', mobility: 'wheelchair', transport: 'no-transport' }),
+      profile: profile({ language: 'zh', needs: ['mobility'], transport: 'needs-assistance' }),
     })
     expect(ranked.map((s) => s.id)).toEqual([
       'triple-zero',
@@ -98,5 +103,38 @@ describe('rankServices', () => {
     const ranked = rankServices({ level: null, inside: false, profile: profile() })
     expect(ranked.length).toBeGreaterThan(0)
     expect(ranked[0].id).toBe('rfs-info')
+  })
+})
+
+describe('the profile changes which help comes first, never the warning', () => {
+  it('promotes the relay service when the user told us they cannot hear well', () => {
+    const withHearing = rankServices({ level: 'advice', inside: false, profile: profile({ needs: ['hearing'] }) })
+    const without = rankServices({ level: 'advice', inside: false, profile: profile({ needs: [] }) })
+    expect(withHearing.findIndex((s) => s.id === 'relay-service'))
+      .toBeLessThan(without.findIndex((s) => s.id === 'relay-service'))
+  })
+
+  it('promotes Service NSW for every transport answer that implies needing help', () => {
+    for (const transport of ['accessible-transport', 'needs-assistance', 'unsure'] as const) {
+      const ranked = rankServices({ level: 'advice', inside: false, profile: profile({ transport }) })
+      const nsw = ranked.findIndex((s) => s.id === 'service-nsw')
+      const rfs = ranked.findIndex((s) => s.id === 'rfs-info')
+      expect(nsw, transport).toBeLessThan(rfs)
+    }
+  })
+
+  it('offers the interpreter line for every language except English', () => {
+    for (const language of LANGUAGE_CODES) {
+      const ranked = rankServices({ level: 'advice', inside: false, profile: profile({ language }) })
+      const hasTis = ranked.some((s) => s.id === 'tis-national')
+      expect(hasTis, language).toBe(language !== 'en')
+    }
+  })
+
+  it('always offers Triple Zero, whatever the profile', () => {
+    for (const language of LANGUAGE_CODES) {
+      const ranked = rankServices({ level: 'advice', inside: false, profile: profile({ language }) })
+      expect(ranked.some((s) => s.id === 'triple-zero'), language).toBe(true)
+    }
   })
 })

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { renderWarning } from './render'
 import type { RelevantWarning } from '@/lib/domain/match'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const relevant: RelevantWarning = {
   warning: {
@@ -19,10 +20,16 @@ const relevant: RelevantWarning = {
     polygons: [],
     officialUrl: 'https://www.rfs.nsw.gov.au/fire-information/fires-near-me',
     rawAdvice: 'Conditions are changing and the fire is moving towards the area.',
+    fields: {},
+    raw: { properties: {}, geometry: null },
+    provenance: makeWarning().provenance,
   },
   distanceKm: 4.8,
   inside: false,
   band: 'very-close',
+  verdict: 'not-currently-affected' as const,
+  reason: 'outside-polygon' as const,
+  rejectedRings: 0,
 }
 
 describe('renderWarning', () => {

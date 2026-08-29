@@ -7,3 +7,16 @@ out/
 *.log
 .DS_Store
 *.tsbuildinfo
+
+# from hackathon scaffold
+coverage/
+.vscode/
+.idea/
+*.pem
+*.key
+tmp/
+.claude/local/
+
+# Local Claude Code tooling, not part of the product
+.claude/
+CLAUDE.md
