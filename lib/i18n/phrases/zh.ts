@@ -24,6 +24,7 @@ export const zh: PhrasePack = {
   },
   statusValues: {
     'out of control': '火势尚未得到控制。',
+    'not yet controlled': '消防员还没有控制住这场火。',
     'being controlled': '消防员正在控制火势。',
     'under control': '火势已得到控制。',
   },
@@ -31,6 +32,11 @@ export const zh: PhrasePack = {
     'bush fire': '丛林火灾',
     'grass fire': '草地火灾',
     'structure fire': '建筑火灾',
+    'burn off': '烧除作业',
+    'hazard reduction': '减少火灾隐患的烧除',
+    'planned event': '计划中的活动',
+    'haystack fire': '干草堆火灾',
+    other: '其他',
   },
   fields: {
     location: '地点',

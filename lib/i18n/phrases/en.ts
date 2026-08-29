@@ -24,6 +24,7 @@ export const en: PhrasePack = {
   },
   statusValues: {
     'out of control': 'The fire is not under control.',
+    'not yet controlled': 'Firefighters have not controlled this fire yet.',
     'being controlled': 'Firefighters are getting the fire under control.',
     'under control': 'The fire is under control.',
   },
@@ -31,6 +32,11 @@ export const en: PhrasePack = {
     'bush fire': 'Bush fire',
     'grass fire': 'Grass fire',
     'structure fire': 'Building fire',
+    'burn off': 'Burn off',
+    'hazard reduction': 'Hazard reduction burn',
+    'planned event': 'Planned event',
+    'haystack fire': 'Haystack fire',
+    other: 'Other',
   },
   fields: {
     location: 'Place',

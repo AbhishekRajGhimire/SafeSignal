@@ -46,6 +46,26 @@ describe('phrase pack completeness', () => {
     }
   })
 
+  it('covers every status and type the live RFS feed actually emits', () => {
+    // Observed in a full feed snapshot on 2026-08-29. The packs were first
+    // written from a single sample feature and missed most of this, which
+    // showed up as untranslated English inside an otherwise translated screen.
+    const liveStatuses = ['out of control', 'not yet controlled', 'being controlled', 'under control']
+    const liveTypes = [
+      'bush fire', 'grass fire', 'structure fire',
+      'burn off', 'hazard reduction', 'planned event', 'haystack fire', 'other',
+    ]
+
+    for (const code of LANGUAGE_CODES) {
+      for (const status of liveStatuses) {
+        expect(PACKS[code].statusValues[status], `${code}.statusValues["${status}"]`).toBeTruthy()
+      }
+      for (const type of liveTypes) {
+        expect(PACKS[code].typeValues[type], `${code}.typeValues["${type}"]`).toBeTruthy()
+      }
+    }
+  })
+
   it('does not leave non-English packs identical to English', () => {
     for (const code of LANGUAGE_CODES) {
       if (code === 'en') continue

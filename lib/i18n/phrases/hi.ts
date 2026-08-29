@@ -24,6 +24,7 @@ export const hi: PhrasePack = {
   },
   statusValues: {
     'out of control': 'आग काबू में नहीं है।',
+    'not yet controlled': 'दमकल कर्मी अभी तक इस आग पर काबू नहीं पा सके हैं।',
     'being controlled': 'दमकल कर्मी आग पर काबू पा रहे हैं।',
     'under control': 'आग काबू में है।',
   },
@@ -31,6 +32,11 @@ export const hi: PhrasePack = {
     'bush fire': 'जंगल की आग',
     'grass fire': 'घास की आग',
     'structure fire': 'इमारत में आग',
+    'burn off': 'नियंत्रित जलाना',
+    'hazard reduction': 'खतरा कम करने के लिए लगाई गई आग',
+    'planned event': 'नियोजित कार्यक्रम',
+    'haystack fire': 'भूसे के ढेर में आग',
+    other: 'अन्य',
   },
   fields: {
     location: 'जगह',

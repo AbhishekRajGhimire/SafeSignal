@@ -24,6 +24,7 @@ export const vi: PhrasePack = {
   },
   statusValues: {
     'out of control': 'Đám cháy chưa được kiểm soát.',
+    'not yet controlled': 'Lính cứu hỏa chưa kiểm soát được đám cháy này.',
     'being controlled': 'Lính cứu hỏa đang kiểm soát đám cháy.',
     'under control': 'Đám cháy đã được kiểm soát.',
   },
@@ -31,6 +32,11 @@ export const vi: PhrasePack = {
     'bush fire': 'Cháy rừng',
     'grass fire': 'Cháy đồng cỏ',
     'structure fire': 'Cháy nhà',
+    'burn off': 'Đốt dọn',
+    'hazard reduction': 'Đốt giảm nguy cơ cháy',
+    'planned event': 'Sự kiện có kế hoạch',
+    'haystack fire': 'Cháy đống rơm',
+    other: 'Khác',
   },
   fields: {
     location: 'Địa điểm',
