@@ -96,7 +96,7 @@ export function buildScenario(anchor: LatLon, anchorLabel: string): ScenarioStep
           rawAdvice:
             'A fire is burning in the area. There is no immediate danger. ' +
             'Stay up to date in case the situation changes.',
-        }, 0),
+        }, 0, [ringAround({ lat: anchor.lat + 8 * KM_IN_DEGREES, lon: anchor.lon }, 1.5)]),
       ],
     },
     {
@@ -110,7 +110,7 @@ export function buildScenario(anchor: LatLon, anchorLabel: string): ScenarioStep
           rawAdvice:
             'Conditions are changing and the fire is moving towards the area. ' +
             'You need to start taking action now to protect yourself and your family.',
-        }, 22),
+        }, 22, [ringAround({ lat: anchor.lat + 5 * KM_IN_DEGREES, lon: anchor.lon }, 3)]),
       ],
     },
     {

@@ -34,12 +34,17 @@ const clockFor = (language: LanguageCode) =>
 export default function Home() {
   const { profile, ready } = useProfile()
   const pack = usePack()
-  const { feed, demoMode, setDemoMode } = useWarnings()
+  const { feed, demoMode, setDemoMode, demoAnchor } = useWarnings()
 
-  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  // In demo mode the scenarios are built around the demo anchor, so
+  // relevance is assessed against the same point. Otherwise a cold
+  // ?demo=1 places a fire around Katoomba and then reports that it does
+  // not know where the user is.
+  const assessedAt = profile.location ?? (demoMode ? demoAnchor : null)
+  const assessment = assess(feed.warnings, assessedAt, feed.freshness)
   const state = screenStateFrom({
     ready,
-    hasLocation: profile.location !== null,
+    hasLocation: assessedAt !== null,
     assessment,
     changes: feed.changes,
     failure: feed.failure,
@@ -113,7 +118,7 @@ export default function Home() {
           <>
             <header className="screen__head">
               <h1>{pack.ui.yourArea}</h1>
-              {profile.location && <p className="lede">{profile.location.label}</p>}
+              {assessedAt && <p className="lede">{assessedAt.label}</p>}
             </header>
 
             {state === 'no-warning' && <NoWarningPanel />}

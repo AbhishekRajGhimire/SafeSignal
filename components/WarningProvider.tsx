@@ -17,6 +17,12 @@ interface WarningContextValue {
   demoMode: boolean
   setDemoMode: (on: boolean) => void
   scenarios: DemoScenario[]
+  /**
+   * The point the demo scenarios are built around. In demo mode this is
+   * what relevance is assessed against, so a cold ?demo=1 with no stored
+   * profile still lands inside the fire rather than reporting no location.
+   */
+  demoAnchor: { lat: number; lon: number; label: string }
   scenarioId: DemoScenarioId
   selectScenario: (id: DemoScenarioId) => void
   /** Back to the default scenario, step 0, paused, real profile restored. */
@@ -25,8 +31,12 @@ interface WarningContextValue {
 
 const WarningContext = createContext<WarningContextValue | null>(null)
 
-/** The strongest single demonstration, so ?demo=1 lands on it. */
-const DEFAULT_SCENARIO: DemoScenarioId = 'escalation'
+/**
+ * A cold ?demo=1 link is often opened with nobody presenting, so it lands
+ * on the emergency itself rather than on the first calm step of the
+ * escalation. The presenter switches to scenario 3 to show the change.
+ */
+const DEFAULT_SCENARIO: DemoScenarioId = 'emergency-here'
 
 export function WarningProvider({ children }: { children: React.ReactNode }) {
   const { profile, update, ready } = useProfile()
@@ -114,12 +124,13 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
       demoMode,
       setDemoMode: exitDemo,
       scenarios,
+      demoAnchor: { lat: anchorLat, lon: anchorLon, label: anchorLabel },
       scenarioId,
       selectScenario,
       resetDemo,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [feed, demo, demoState, demoMode, scenarios, scenarioId],
+    [feed, demo, demoState, demoMode, scenarios, scenarioId, anchorLat, anchorLon, anchorLabel],
   )
 
   return <WarningContext.Provider value={value}>{children}</WarningContext.Provider>

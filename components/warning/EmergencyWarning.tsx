@@ -69,11 +69,13 @@ export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
         {/* 4 and 7. What the authority said, and where it came from. */}
         <OfficialBlock view={view} warning={relevant.warning} />
 
-        {/* 8. The official assistance pathway. The last thing, and the
-            largest target, because it is what the screen is for. */}
-        <Link className="button button--help" href="/help">
-          {pack.ui.getHelp}
-        </Link>
+        {/* 8. The official assistance pathway. Pinned within thumb reach,
+            because it is what the screen is for. */}
+        <div className="emergency__cta">
+          <Link className="button button--help" href="/help">
+            {pack.ui.getHelp}
+          </Link>
+        </div>
       </div>
     </article>
   )
