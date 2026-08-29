@@ -6,7 +6,8 @@ import { useProfile, usePack } from '@/components/ProfileProvider'
 import { useWarnings } from '@/components/WarningProvider'
 import { WarningCard } from '@/components/WarningCard'
 import { DemoControls } from '@/components/DemoControls'
-import { matchWarnings } from '@/lib/domain/match'
+import { assess } from '@/lib/domain/match'
+import { LocationStatus } from '@/components/LocationStatus'
 import { renderWarning } from '@/lib/i18n/render'
 import { speak } from '@/lib/speech/tts'
 
@@ -22,7 +23,10 @@ export default function Home() {
   const pack = usePack()
   const { feed, demo, demoState, demoMode, setDemoMode } = useWarnings()
 
-  const relevant = matchWarnings(feed.warnings, profile.location)
+  // One assessment answers "does this affect my location?" for every warning,
+  // and the four possible answers are distinguished on screen.
+  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  const relevant = assessment.all
   const top = relevant[0] ?? null
   const topId = top?.warning.id ?? null
   const topLevel = top?.warning.level ?? null
@@ -68,11 +72,17 @@ export default function Home() {
 
         {demo && demoState && <DemoControls demo={demo} state={demoState} />}
 
+        {/* The verdict comes first: it is the question the user actually has. */}
+        <LocationStatus assessment={assessment} />
+
+        {/* When the location is affected, the official warning follows. */}
         {relevant.length === 0 ? (
-          <div className="card">
-            <h2>{pack.ui.noWarningsTitle}</h2>
-            <p>{pack.ui.noWarningsBody}</p>
-          </div>
+          assessment.verdict === 'not-currently-affected' && (
+            <div className="card">
+              <h2>{pack.ui.noWarningsTitle}</h2>
+              <p>{pack.ui.noWarningsBody}</p>
+            </div>
+          )
         ) : (
           relevant.map((item) => <WarningCard key={item.warning.id} relevant={item} />)
         )}

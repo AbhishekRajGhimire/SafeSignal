@@ -7,7 +7,7 @@ import { useWarnings } from '@/components/WarningProvider'
 import { ServiceCard } from '@/components/ServiceCard'
 import { CallScriptPanel } from '@/components/CallScriptPanel'
 import { Checklist } from '@/components/Checklist'
-import { matchWarnings } from '@/lib/domain/match'
+import { assess } from '@/lib/domain/match'
 import { rankServices } from '@/lib/help/services'
 import { buildShareMessage, shareSituation } from '@/lib/help/share'
 
@@ -19,12 +19,12 @@ export default function HelpPage() {
 
   if (!ready) return <main><p>...</p></main>
 
-  const relevant = matchWarnings(feed.warnings, profile.location)
-  const top = relevant[0] ?? null
+  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  const top = assessment.all[0] ?? null
 
   const services = rankServices({
     level: top?.warning.level ?? null,
-    inside: top?.inside ?? false,
+    inside: top?.verdict === 'affected',
     profile,
   })
 

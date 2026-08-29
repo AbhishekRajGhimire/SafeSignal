@@ -79,6 +79,18 @@ export const UI_KEYS = [
   'locationChosen',
   'placesFound',
   'noPlacesFound',
+  // Relevance verdicts
+  'statusAffected',
+  'statusNotAffected',
+  'statusNotAffectedBody',
+  'statusUndetermined',
+  'statusUnavailable',
+  'reasonNoLocation',
+  'reasonNoMapArea',
+  'reasonUnreadableArea',
+  'reasonOutOfDate',
+  'reasonNoData',
+  'checkOfficial',
 ] as const
 
 export type UIKey = (typeof UI_KEYS)[number]
