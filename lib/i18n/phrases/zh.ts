@@ -138,5 +138,10 @@ export const zh: PhrasePack = {
     loadingTitle: '正在准备您的设置',
     warningChanged: '此警报已更新',
     otherWarnings: '您附近的其他警报',
+    officialMessageLabel: '官方消息',
+    explanationLabel: 'SafeSignal 说明',
+    explanationNote: '由 SafeSignal 翻译并简化。以上官方消息为准。',
+    translationUnavailable: '目前无法提供翻译。上方为官方消息。',
+    sourceLabel: '来源',
   },
 }

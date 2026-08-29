@@ -144,5 +144,10 @@ export const ne: PhrasePack = {
     loadingTitle: 'तपाईंको सेटिङ तयार गर्दै',
     warningChanged: 'यो चेतावनी बदलिएको छ',
     otherWarnings: 'तपाईंको नजिकका अन्य चेतावनी',
+    officialMessageLabel: 'आधिकारिक सन्देश',
+    explanationLabel: 'SafeSignal को व्याख्या',
+    explanationNote: 'SafeSignal ले अनुवाद र सरल बनाएको। माथिको आधिकारिक सन्देश नै आधिकारिक हो।',
+    translationUnavailable: 'अहिले अनुवाद उपलब्ध छैन। माथि आधिकारिक सन्देश देखाइएको छ।',
+    sourceLabel: 'स्रोत',
   },
 }

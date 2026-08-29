@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { OfficialBlock } from './OfficialBlock'
 import { SpeakButton } from '../SpeakButton'
 import { usePack, useProfile } from '../ProfileProvider'
-import { useSimplifiedAdvice } from '../useSimplifiedAdvice'
 import { renderWarning } from '@/lib/i18n/render'
 import type { RelevantWarning } from '@/lib/domain/match'
 
@@ -24,7 +23,6 @@ export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
   const { profile } = useProfile()
   const pack = usePack()
   const view = renderWarning(relevant, profile.language)
-  const simplified = useSimplifiedAdvice(relevant.warning.rawAdvice, profile.language)
   const level = relevant.warning.level
 
   return (
@@ -60,14 +58,6 @@ export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
 
         {/* 4 and 7. What the authority said, and where it came from. */}
         <OfficialBlock view={view} warning={relevant.warning} />
-
-        {simplified && (
-          <section className="plain-block">
-            <h3 className="plain-block__label">{pack.ui.officialWording}</h3>
-            <p>{simplified}</p>
-            <p className="muted">{pack.ui.sourceRfs}</p>
-          </section>
-        )}
 
         {/* 8. The official assistance pathway. The last thing, and the
             largest target, because it is what the screen is for. */}

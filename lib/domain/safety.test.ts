@@ -96,3 +96,37 @@ describe('never invents emergency advice', () => {
     expect(source).toContain("source: 'safesignal'")
   })
 })
+
+describe('the language layer never replaces the official message', () => {
+  it('always renders the official text, whatever the translation did', () => {
+    const source = readFileSync('components/warning/OfficialBlock.tsx', 'utf8')
+    // The official <pre> is unconditional; only the explanation is guarded.
+    expect(source).toMatch(/<pre className="message__official" lang="en">/)
+    const officialIndex = source.indexOf('message__official')
+    const guardIndex = source.indexOf('wantsTranslation &&')
+    expect(officialIndex).toBeGreaterThan(-1)
+    expect(guardIndex).toBeGreaterThan(officialIndex)
+  })
+
+  it('labels SafeSignal output as SafeSignal output, never as official', () => {
+    const source = readFileSync('components/warning/OfficialBlock.tsx', 'utf8')
+    expect(source).toContain('explanationLabel')
+    expect(source).toContain('officialMessageLabel')
+    // Regression guard: an earlier build labelled the AI explanation with
+    // `officialWording`, which read as if the model had written the warning.
+    expect(source).not.toContain('officialWording')
+  })
+
+  it('sends only feed-authored free text to the model', () => {
+    const source = readFileSync('components/warning/OfficialBlock.tsx', 'utf8')
+    expect(source).toContain('useTranslation(warning.rawAdvice')
+  })
+
+  it('never sends a phrase pack to the model', () => {
+    for (const file of FILES) {
+      const source = readFileSync(file, 'utf8')
+      if (!source.includes('/api/translate')) continue
+      expect(source, file).not.toMatch(/pack\.(levelAction|levelMeaning|levelName)/)
+    }
+  })
+})

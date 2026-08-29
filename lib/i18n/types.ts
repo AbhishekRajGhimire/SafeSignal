@@ -94,6 +94,11 @@ export const UI_KEYS = [
   'loadingTitle',
   'warningChanged',
   'otherWarnings',
+  'officialMessageLabel',
+  'explanationLabel',
+  'explanationNote',
+  'translationUnavailable',
+  'sourceLabel',
 ] as const
 
 export type UIKey = (typeof UI_KEYS)[number]

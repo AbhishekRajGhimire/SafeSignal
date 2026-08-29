@@ -147,5 +147,10 @@ export const ar: PhrasePack = {
     loadingTitle: 'نجهّز إعداداتك',
     warningChanged: 'تغيّر هذا التحذير',
     otherWarnings: 'تحذيرات أخرى قريبة منك',
+    officialMessageLabel: 'الرسالة الرسمية',
+    explanationLabel: 'شرح SafeSignal',
+    explanationNote: 'تُرجم وبُسّط بواسطة SafeSignal. الرسالة الرسمية أعلاه هي المرجع.',
+    translationUnavailable: 'الترجمة غير متاحة الآن. الرسالة الرسمية معروضة أعلاه.',
+    sourceLabel: 'المصدر',
   },
 }

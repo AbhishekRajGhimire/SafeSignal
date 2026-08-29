@@ -138,5 +138,10 @@ export const hi: PhrasePack = {
     loadingTitle: 'आपकी सेटिंग तैयार की जा रही है',
     warningChanged: 'यह चेतावनी बदल गई है',
     otherWarnings: 'आपके पास की अन्य चेतावनियाँ',
+    officialMessageLabel: 'आधिकारिक संदेश',
+    explanationLabel: 'SafeSignal की व्याख्या',
+    explanationNote: 'SafeSignal द्वारा अनुवादित और सरल किया गया। ऊपर दिया आधिकारिक संदेश ही मान्य है।',
+    translationUnavailable: 'अभी अनुवाद उपलब्ध नहीं है। ऊपर आधिकारिक संदेश दिखाया गया है।',
+    sourceLabel: 'स्रोत',
   },
 }

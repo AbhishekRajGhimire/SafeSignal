@@ -138,5 +138,10 @@ export const en: PhrasePack = {
     loadingTitle: 'Getting your settings ready',
     warningChanged: 'This warning has changed',
     otherWarnings: 'Other warnings near you',
+    officialMessageLabel: 'Official message',
+    explanationLabel: 'SafeSignal explanation',
+    explanationNote: 'Translated and simplified by SafeSignal. The official message above is the source of truth.',
+    translationUnavailable: 'A translation is not available right now. The official message is shown above.',
+    sourceLabel: 'Source',
   },
 }

@@ -138,5 +138,10 @@ export const vi: PhrasePack = {
     loadingTitle: 'Đang chuẩn bị cài đặt của bạn',
     warningChanged: 'Cảnh báo này đã thay đổi',
     otherWarnings: 'Các cảnh báo khác gần bạn',
+    officialMessageLabel: 'Thông điệp chính thức',
+    explanationLabel: 'Giải thích của SafeSignal',
+    explanationNote: 'Do SafeSignal dịch và đơn giản hoá. Thông điệp chính thức ở trên mới là căn cứ.',
+    translationUnavailable: 'Hiện chưa có bản dịch. Thông điệp chính thức được hiển thị ở trên.',
+    sourceLabel: 'Nguồn',
   },
 }
