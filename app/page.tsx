@@ -19,14 +19,17 @@ import { screenStateFrom, isEscalation } from '@/lib/domain/screenState'
 import { summariseWarningChange } from '@/lib/domain/changeSummary'
 import { WhatChanged } from '@/components/warning/WhatChanged'
 import { renderWarning } from '@/lib/i18n/render'
+import { speechLocaleOf } from '@/lib/i18n'
+import type { LanguageCode } from '@/lib/domain/profile'
 import { getSpeechEngine } from '@/lib/speech/tts'
 
-const sydneyTime = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Australia/Sydney',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
+const clockFor = (language: LanguageCode) =>
+  new Intl.DateTimeFormat(speechLocaleOf(language), {
+    timeZone: 'Australia/Sydney',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
 
 export default function Home() {
   const { profile, ready } = useProfile()
@@ -76,7 +79,7 @@ export default function Home() {
           className="button button--secondary"
           onClick={() => setDemoMode(true)}
         >
-          Demo mode
+          {pack.ui.switchToDemo}
         </button>
       </main>
     )
@@ -135,7 +138,7 @@ export default function Home() {
             failure, so it sits on every screen regardless of state. */}
         <footer className="screen__foot">
           <p className="muted">
-            {pack.ui.dataAsOf} {feed.fetchedAt ? sydneyTime.format(feed.fetchedAt) : '—'}
+            {pack.ui.dataAsOf} {feed.fetchedAt ? clockFor(profile.language).format(feed.fetchedAt) : '—'}
           </p>
           <p className="muted">{pack.ui.sourceRfs}</p>
           <div className="screen__actions">
@@ -147,7 +150,7 @@ export default function Home() {
               className="button button--secondary"
               onClick={() => setDemoMode(!demoMode)}
             >
-              {demoMode ? 'Live mode' : 'Demo mode'}
+              {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
             </button>
           </div>
         </footer>

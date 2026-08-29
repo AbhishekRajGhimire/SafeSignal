@@ -9,7 +9,9 @@ export interface RenderedWarning {
   levelMeaning: string
   /** What to do about it. */
   levelAction: string
+  /** Kept in English on purpose: see the note on `placeText` below. */
   placeText: string
+  councilText: string
   statusText: string
   typeText: string
   sizeText: string | null
@@ -30,14 +32,29 @@ const OFFICIAL_LEVEL: Record<string, string> = {
   'not-applicable': 'Not Applicable',
 }
 
-const sydneyTime = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Australia/Sydney',
-  day: '2-digit',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
+/**
+ * Formatted in the user's own language, not en-GB. Hardcoding the locale
+ * printed English month names ("14 Nov") inside an otherwise translated
+ * screen. Formatters are memoised because constructing one is not cheap.
+ */
+const timeFormatters = new Map<string, Intl.DateTimeFormat>()
+
+function sydneyTimeFor(language: LanguageCode): Intl.DateTimeFormat {
+  const locale = speechLocaleOf(language)
+  let formatter = timeFormatters.get(locale)
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      timeZone: 'Australia/Sydney',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+    timeFormatters.set(locale, formatter)
+  }
+  return formatter
+}
 
 /**
  * The official English text, shown verbatim beneath the translation.
@@ -94,12 +111,16 @@ export function renderWarning(
     levelName: pack.levelName[w.level],
     levelMeaning,
     levelAction,
+    // Australian place names stay in English deliberately. A translated
+    // street name cannot be matched to a road sign, read to a 000 operator,
+    // or searched on a map. The UI labels it instead of translating it.
     placeText: w.location || w.title,
+    councilText: w.council,
     statusText,
     typeText,
     sizeText: w.sizeHa !== null ? `${w.sizeHa} ha` : null,
     distanceText,
-    updatedText: w.updatedAt ? sydneyTime.format(w.updatedAt) : null,
+    updatedText: w.updatedAt ? sydneyTimeFor(language).format(w.updatedAt) : null,
     officialText: buildOfficialText(relevant),
     officialUrl: w.officialUrl,
     // Speaks the meaning and the action, never the jargon label.

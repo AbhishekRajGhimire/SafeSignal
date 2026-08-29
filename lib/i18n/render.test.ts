@@ -83,6 +83,25 @@ describe('renderWarning', () => {
     expect(renderWarning(relevant, 'en').updatedText).toContain('14:22')
   })
 
+  it('formats the date in the reader\'s language, not always English', () => {
+    // The locale was hardcoded to en-GB, so every language printed English
+    // month names inside an otherwise translated screen.
+    for (const language of ['en', 'zh', 'hi', 'vi'] as const) {
+      expect(renderWarning(relevant, language).updatedText, language).toContain('14:22')
+    }
+    expect(renderWarning(relevant, 'zh').updatedText).toContain('11月')
+    expect(renderWarning(relevant, 'en').updatedText).toContain('Nov')
+    expect(renderWarning(relevant, 'zh').updatedText).not.toContain('Nov')
+  })
+
+  it('keeps the place name and council in English so they can be acted on', () => {
+    // A translated street name cannot be matched to a road sign or read to
+    // a 000 operator. The UI labels it instead of translating it.
+    const r = renderWarning(relevant, 'zh')
+    expect(r.placeText).toBe('Green Gully Trail, Katoomba')
+    expect(r.councilText).toBe('Blue Mountains')
+  })
+
   it('builds speech text from the meaning and the action, not the jargon', () => {
     const r = renderWarning(relevant, 'en')
     expect(r.speechText).toContain('A fire is close.')

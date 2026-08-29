@@ -1,13 +1,18 @@
 'use client'
 
+import { usePack } from './ProfileProvider'
 import { useWarnings } from './WarningProvider'
 
 /**
- * Presenter controls. English on purpose: this panel is for the person
- * giving the demonstration, never for the person the product serves, and it
- * only renders in demo mode — which is banner-labelled as simulated.
+ * Presenter controls, shown only in demo mode.
+ *
+ * The transport controls are translated: a judge exploring on their own
+ * phone in Mandarin should not hit a wall of English. The scenario names
+ * stay in English because they describe the demonstration rather than the
+ * product, and they are read by the presenter.
  */
 export function DemoControls() {
+  const pack = usePack()
   const { demo, demoState, scenarios, scenarioId, selectScenario, resetDemo } = useWarnings()
   if (!demo || !demoState) return null
 
@@ -38,7 +43,7 @@ export function DemoControls() {
             className="button button--secondary"
             onClick={() => (demoState.playing ? demo.pause() : demo.play())}
           >
-            {demoState.playing ? 'Pause' : 'Play'}
+            {demoState.playing ? pack.ui.demoPause : pack.ui.demoPlay}
           </button>
 
           {/* Lets a presenter jump straight to any step. */}
@@ -60,7 +65,7 @@ export function DemoControls() {
       {/* One tap back to a known state: default scenario, step 0, paused,
           and the presenter's real profile restored. */}
       <button type="button" className="button button--secondary" onClick={resetDemo}>
-        Reset demo
+        {pack.ui.demoRestart}
       </button>
     </section>
   )

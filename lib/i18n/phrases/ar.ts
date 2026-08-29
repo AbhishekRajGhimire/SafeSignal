@@ -166,5 +166,11 @@ export const ar: PhrasePack = {
     changeStatus: 'تغيّرت حالة الحريق من {from} إلى {to}.',
     changeSize: 'تغيّرت مساحة الحريق من {from} إلى {to}.',
     changeTime: 'تغيّر وقت التحديث الرسمي إلى {time}.',
+    demoPlay: 'تشغيل',
+    demoPause: 'إيقاف مؤقت',
+    demoRestart: 'إعادة البدء',
+    switchToLive: 'الوضع المباشر',
+    switchToDemo: 'وضع العرض',
+    otherServices: 'أرقام هاتف أخرى',
   },
 }

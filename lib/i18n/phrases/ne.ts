@@ -163,5 +163,11 @@ export const ne: PhrasePack = {
     changeStatus: 'आगोको अवस्था {from} बाट {to} भयो।',
     changeSize: 'आगोको क्षेत्रफल {from} बाट {to} भयो।',
     changeTime: 'आधिकारिक अद्यावधिक समय {time} भयो।',
+    demoPlay: 'बजाउनुहोस्',
+    demoPause: 'रोक्नुहोस्',
+    demoRestart: 'सुरुबाट',
+    switchToLive: 'लाइभ मोड',
+    switchToDemo: 'डेमो मोड',
+    otherServices: 'अन्य फोन नम्बरहरू',
   },
 }
