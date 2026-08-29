@@ -35,7 +35,7 @@ It is what separates SafeSignal from an app that invents emergency guidance, and
 In scope:
 
 - NSW bushfires only, via the public NSW RFS GeoJSON feed
-- Five languages: English, Mandarin (Simplified), Arabic, Vietnamese, Greek
+- Four languages: English, Mandarin (Simplified), Hindi, Vietnamese
 - Location matching against the user's stated or detected location
 - Text-to-speech in the selected language
 - Large-text mode
@@ -109,7 +109,7 @@ safesignal/
     rfs/          fetch.ts  parse.ts  normalize.ts
     domain/       warning.ts  profile.ts  match.ts
     sources/      live.ts  demo.ts  types.ts
-    i18n/         phrases/{en,zh,ar,vi,el}.ts  render.ts
+    i18n/         phrases/{en,zh,hi,vi}.ts  render.ts
     speech/       tts.ts
     help/         services.ts  callScript.ts
   components/
@@ -208,7 +208,7 @@ Results sort by severity first, then by distance.
 ```ts
 interface UserProfile {
   location: { lat: number; lon: number; label: string } | null
-  language: 'en' | 'zh' | 'ar' | 'vi' | 'el'
+  language: 'en' | 'zh' | 'hi' | 'vi'
   mobility: 'none' | 'limited-walking' | 'wheelchair' | 'bedbound'
   transport: 'own-car' | 'can-get-lift' | 'no-transport'
   largeText: boolean
@@ -249,11 +249,19 @@ Every caller must render correctly when it is unavailable.
 
 ### 7.1 Language set
 
-English, Mandarin (Simplified), Arabic, Vietnamese, Greek.
+English, Mandarin (Simplified), Hindi, Vietnamese.
 
-The set is drawn from NSW community language data.
-Arabic is included deliberately because it forces correct right-to-left layout.
-An app that only ever handles left-to-right languages has not actually solved the problem.
+The set is drawn from NSW community language data and covers three of the largest non-English speaking communities in the state.
+Mandarin carries the scenario in the problem statement.
+Hindi and Vietnamese extend coverage to two other large communities without adding a new writing direction.
+
+All four languages are left-to-right, so no right-to-left layout work is required.
+This was a deliberate trade.
+An earlier draft included Arabic specifically to force correct right-to-left handling, and dropping it saves real build time at the cost of that demonstration.
+If right-to-left support is wanted later, it is additive: the phrase pack structure does not change, only the layout direction and a handful of logical CSS properties.
+
+Hindi introduces one script consideration that Latin and Han scripts do not.
+Devanagari needs a font stack that actually resolves on the device, so the type stack must declare a Devanagari fallback rather than relying on a single family.
 
 ### 7.2 Phrase pack
 
@@ -434,8 +442,8 @@ The feed parser receives the most coverage: the day-first date trap, malformed d
 
 The matcher covers point-in-polygon, haversine distance, and the banding thresholds.
 
-The renderer gets a phrase pack completeness test asserting that all five languages define every key.
-This is cheap and it catches the classic demo failure where the Arabic build renders `undefined` on stage.
+The renderer gets a phrase pack completeness test asserting that all four languages define every key.
+This is cheap and it catches the classic demo failure where the Hindi build renders `undefined` on stage.
 
 The demo engine gets timing and ordering tests.
 
@@ -449,7 +457,7 @@ Sequenced so the risky work happens while the team is fresh.
 2. Domain matching, profile, localStorage
 3. Setup wizard and main warning screen, English only
 4. The `WarningSource` seam, `LiveSource`, `DemoSource`, the scenario
-5. Phrase packs, rendering, language switching, right-to-left
+5. Phrase packs, rendering, language switching
 6. Speech and large text
 7. Help layer: directory, then call script, then share, then checklist
 8. PWA manifest, service worker, offline
@@ -467,7 +475,7 @@ A browser-only build is impossible.
 This is already resolved by the server proxy, and is recorded here so nobody tries to remove it.
 
 Text-to-speech voice availability varies by device.
-An unfamiliar demo phone may lack a Mandarin or Arabic voice.
+An unfamiliar demo phone may lack a Mandarin or Hindi voice.
 Mitigated by runtime voice detection and pre-generated demo audio.
 
 Translation quality in the phrase packs is only as good as the translations written into them.
