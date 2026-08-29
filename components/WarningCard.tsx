@@ -20,9 +20,46 @@ export function WarningCard({ relevant }: { relevant: RelevantWarning }) {
 
       {/* The plain meaning is the headline. The official label is the badge. */}
       <h2>{view.levelMeaning}</h2>
-      <p><strong>{view.placeText}</strong></p>
-      {view.distanceText && <p>{view.distanceText}</p>}
-      <p>{view.statusText}</p>
+
+      {/* Place names stay in English so they can be matched to a road sign or
+          read to a 000 operator. The label is translated so the reader knows
+          what the English text is. */}
+      <dl className="facts">
+        <dt>{pack.fields.location}</dt>
+        <dd lang="en">{view.placeText}</dd>
+
+        {view.councilText && (
+          <>
+            <dt>{pack.fields.council}</dt>
+            <dd lang="en">{view.councilText}</dd>
+          </>
+        )}
+
+        {view.distanceText && (
+          <>
+            <dt>{pack.ui.yourArea}</dt>
+            <dd>{view.distanceText}</dd>
+          </>
+        )}
+
+        <dt>{pack.fields.status}</dt>
+        <dd>{view.statusText}</dd>
+
+        {view.typeText && (
+          <>
+            <dt>{pack.fields.size}</dt>
+            <dd>{view.typeText}{view.sizeText ? ` · ${view.sizeText}` : ''}</dd>
+          </>
+        )}
+
+        {view.updatedText && (
+          <>
+            <dt>{pack.fields.updated}</dt>
+            <dd>{view.updatedText}</dd>
+          </>
+        )}
+      </dl>
+
       <p><strong>{view.levelAction}</strong></p>
 
       {simplified && (
@@ -42,10 +79,6 @@ export function WarningCard({ relevant }: { relevant: RelevantWarning }) {
           {pack.ui.viewOfficial}
         </a>
       </details>
-
-      {view.updatedText && (
-        <p className="muted">{pack.fields.updated}: {view.updatedText}</p>
-      )}
 
       <Link className="button button--danger" href="/help">{pack.ui.getHelp}</Link>
     </article>

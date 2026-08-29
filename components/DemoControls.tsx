@@ -1,8 +1,11 @@
 'use client'
 
+import { usePack } from './ProfileProvider'
 import type { DemoSource, DemoState } from '@/lib/sources/demo'
 
 export function DemoControls({ demo, state }: { demo: DemoSource; state: DemoState }) {
+  const pack = usePack()
+
   return (
     <div className="card stack">
       <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
@@ -11,10 +14,10 @@ export function DemoControls({ demo, state }: { demo: DemoSource; state: DemoSta
           className="button button--secondary"
           onClick={() => (state.playing ? demo.pause() : demo.play())}
         >
-          {state.playing ? 'Pause' : 'Play'}
+          {state.playing ? pack.ui.demoPause : pack.ui.demoPlay}
         </button>
         <button type="button" className="button button--secondary" onClick={() => demo.restart()}>
-          Restart
+          {pack.ui.demoRestart}
         </button>
       </div>
 
@@ -25,6 +28,7 @@ export function DemoControls({ demo, state }: { demo: DemoSource; state: DemoSta
             key={index}
             type="button"
             className={`button ${index === state.stepIndex ? '' : 'button--secondary'}`}
+            aria-current={index === state.stepIndex ? 'step' : undefined}
             onClick={() => demo.seek(index)}
           >
             {index + 1}

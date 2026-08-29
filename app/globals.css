@@ -130,6 +130,32 @@ p { margin: 0 0 var(--space-2); }
 
 .muted { color: var(--ink-muted); font-size: var(--text-sm); }
 
+/* Labelled facts. Place names stay in English, so the translated label is
+   what tells the reader what the English text actually is. */
+.facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  margin: 0 0 var(--space-2);
+}
+
+.facts dt {
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  white-space: nowrap;
+}
+
+.facts dd { margin: 0; font-weight: 600; }
+
+/* The single most urgent action, when there is one. */
+.primary-action {
+  border: 2px solid var(--level-emergency-warning);
+  border-radius: 12px;
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+  background: var(--paper);
+}
+
 .field { display: block; margin-bottom: var(--space-3); }
 .field > span { display: block; font-weight: 600; margin-bottom: var(--space-1); }
 

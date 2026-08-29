@@ -9,13 +9,16 @@ import { DemoControls } from '@/components/DemoControls'
 import { matchWarnings } from '@/lib/domain/match'
 import { renderWarning } from '@/lib/i18n/render'
 import { speak } from '@/lib/speech/tts'
+import { SPEECH_LOCALE } from '@/lib/i18n'
 
-const sydneyTime = new Intl.DateTimeFormat('en-GB', {
-  timeZone: 'Australia/Sydney',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
+// Formatted in the user's language, not en-GB.
+const clockFor = (language: keyof typeof SPEECH_LOCALE) =>
+  new Intl.DateTimeFormat(SPEECH_LOCALE[language], {
+    timeZone: 'Australia/Sydney',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
 
 export default function Home() {
   const { profile, ready } = useProfile()
@@ -51,7 +54,7 @@ export default function Home() {
           className="button button--secondary"
           onClick={() => setDemoMode(true)}
         >
-          Demo mode
+          {pack.ui.switchToDemo}
         </button>
       </main>
     )
@@ -79,7 +82,7 @@ export default function Home() {
 
         {/* Freshness is never optional: silent staleness is the dangerous failure. */}
         <p className="muted">
-          {pack.ui.dataAsOf} {feed.fetchedAt ? sydneyTime.format(feed.fetchedAt) : '-'}
+          {pack.ui.dataAsOf} {feed.fetchedAt ? clockFor(profile.language).format(feed.fetchedAt) : '-'}
         </p>
 
         <div className="stack">
@@ -89,7 +92,7 @@ export default function Home() {
             className="button button--secondary"
             onClick={() => setDemoMode(!demoMode)}
           >
-            {demoMode ? 'Live mode' : 'Demo mode'}
+            {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
           </button>
         </div>
       </main>
