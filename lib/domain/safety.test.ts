@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { PACKS } from '@/lib/i18n'
 import { PACK_LANGUAGES } from '@/lib/domain/profile'
+import { REVEAL_MS as REVEAL_BUDGET_MS } from '@/lib/motion/reveal'
 
 /**
  * Standing safety rules, enforced rather than remembered.
@@ -223,5 +224,33 @@ describe('demo data never mixes with live data', () => {
   it('keeps the simulated-data banner unconditional in demo mode', () => {
     const page = readFileSync('app/page.tsx', 'utf8')
     expect(page).toMatch(/demoMode && <div className="banner banner--demo">/)
+  })
+})
+
+describe('motion never gates emergency information', () => {
+  const motion = readFileSync('lib/motion/reveal.ts', 'utf8')
+
+  it('honours prefers-reduced-motion by doing nothing at all', () => {
+    expect(motion).toContain('if (prefersReducedMotion()) return')
+  })
+
+  it('never animates content in from invisible', () => {
+    // from({ opacity: 0 }) would mean a person arriving mid-transition, or
+    // whose browser drops the animation, sees nothing. Partial fades are
+    // allowed; a full one is not.
+    expect(motion).not.toMatch(/opacity:\s*0\s*[,}]/)
+  })
+
+  it('never loops or flashes', () => {
+    expect(motion).not.toContain('repeat: -1')
+    expect(motion).not.toContain('yoyo: true, repeat: -1')
+  })
+
+  it('keeps the whole arrival under 400ms', () => {
+    expect(REVEAL_BUDGET_MS).toBeLessThanOrEqual(400)
+  })
+
+  it('reverts cleanly, so a killed animation cannot strand a hidden element', () => {
+    expect(motion).toContain("clearProps: 'all'")
   })
 })

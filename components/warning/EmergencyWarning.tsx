@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
+import { revealEmergency } from '@/lib/motion/reveal'
 import { OfficialBlock } from './OfficialBlock'
 import { SpeechControls } from '../speech/SpeechControls'
 import { usePack, useProfile } from '../ProfileProvider'
@@ -20,13 +22,21 @@ import type { RelevantWarning } from '@/lib/domain/match'
  * a word and a shape as well as that colour.
  */
 export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
+  const root = useRef<HTMLElement>(null)
   const { profile } = useProfile()
   const pack = usePack()
   const view = renderWarning(relevant, profile.language)
   const level = relevant.warning.level
 
+  // Re-runs when the level changes, so an escalation settles in the same
+  // way a new warning does. Reverted on unmount and under reduced motion.
+  useEffect(() => {
+    if (!root.current) return
+    return revealEmergency(root.current)
+  }, [level, relevant.warning.id])
+
   return (
-    <article className={`emergency emergency--${level}`}>
+    <article ref={root} className={`emergency emergency--${level}`}>
       {/* 1. What is happening. The official label, unmistakable. */}
       <div className="emergency__band">
         <span className="emergency__shape" aria-hidden="true">
