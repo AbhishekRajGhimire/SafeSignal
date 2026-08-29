@@ -1,13 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { useProfile, usePack } from './ProfileProvider'
+import { useProfile } from './ProfileProvider'
 import { buildCallScript, type HelpNeed } from '@/lib/help/callScript'
 import type { Warning } from '@/lib/domain/warning'
 
 export function CallScriptPanel({ warning }: { warning: Warning | null }) {
   const { profile } = useProfile()
-  const pack = usePack()
   const [need, setNeed] = useState<HelpNeed>('evacuate')
   const script = buildCallScript(profile, warning, need)
 
@@ -26,7 +25,6 @@ export function CallScriptPanel({ warning }: { warning: Warning | null }) {
 
   return (
     <section className="card stack">
-      <h2>{pack.ui.whatToSay}</h2>
 
       {needs.map((option) => (
         <button

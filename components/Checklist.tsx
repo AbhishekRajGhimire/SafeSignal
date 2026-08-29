@@ -13,7 +13,6 @@ export function Checklist({ warning }: { warning: Warning | null }) {
 
   return (
     <section className="card stack">
-      <h2>{pack.ui.whatToDo}</h2>
       <ul style={{ paddingLeft: 'var(--space-3)' }}>
         {items.map((item, index) => (
           <li key={index} style={{ marginBottom: 'var(--space-2)' }}>
