@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { OfficialBlock } from './OfficialBlock'
-import { SpeakButton } from '../SpeakButton'
+import { SpeechControls } from '../speech/SpeechControls'
 import { usePack, useProfile } from '../ProfileProvider'
 import { renderWarning } from '@/lib/i18n/render'
 import type { RelevantWarning } from '@/lib/domain/match'
@@ -54,7 +54,7 @@ export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
         </div>
 
         {/* 5. Can I hear it. */}
-        <SpeakButton text={view.speechText} locale={view.speechLocale} />
+        <SpeechControls text={view.speechText} locale={view.speechLocale} />
 
         {/* 4 and 7. What the authority said, and where it came from. */}
         <OfficialBlock view={view} warning={relevant.warning} />

@@ -152,5 +152,11 @@ export const ar: PhrasePack = {
     explanationNote: 'تُرجم وبُسّط بواسطة SafeSignal. الرسالة الرسمية أعلاه هي المرجع.',
     translationUnavailable: 'الترجمة غير متاحة الآن. الرسالة الرسمية معروضة أعلاه.',
     sourceLabel: 'المصدر',
+    pause: 'إيقاف مؤقت',
+    resume: 'متابعة',
+    replay: 'تشغيل مرة أخرى',
+    paused: 'متوقّف مؤقتاً',
+    readingAloud: 'تتم القراءة بصوت مسموع',
+    speechNotSupported: 'هذا المتصفّح لا يستطيع قراءة النص بصوت مسموع.',
   },
 }

@@ -143,5 +143,11 @@ export const zh: PhrasePack = {
     explanationNote: '由 SafeSignal 翻译并简化。以上官方消息为准。',
     translationUnavailable: '目前无法提供翻译。上方为官方消息。',
     sourceLabel: '来源',
+    pause: '暂停',
+    resume: '继续',
+    replay: '重新播放',
+    paused: '已暂停',
+    readingAloud: '正在朗读',
+    speechNotSupported: '此浏览器无法朗读文字。',
   },
 }

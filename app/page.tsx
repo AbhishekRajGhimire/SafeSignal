@@ -17,7 +17,7 @@ import { DemoControls } from '@/components/DemoControls'
 import { assess } from '@/lib/domain/match'
 import { screenStateFrom, isEscalation } from '@/lib/domain/screenState'
 import { renderWarning } from '@/lib/i18n/render'
-import { speak } from '@/lib/speech/tts'
+import { getSpeechEngine } from '@/lib/speech/tts'
 
 const sydneyTime = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'Australia/Sydney',
@@ -49,7 +49,7 @@ export default function Home() {
   useEffect(() => {
     if (!profile.audio || !top) return
     const view = renderWarning(top, profile.language)
-    void speak(view.speechText, view.speechLocale)
+    getSpeechEngine()?.speak(view.speechText, view.speechLocale)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [topId, topLevel, profile.audio, profile.language])
 

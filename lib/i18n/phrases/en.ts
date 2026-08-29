@@ -143,5 +143,11 @@ export const en: PhrasePack = {
     explanationNote: 'Translated and simplified by SafeSignal. The official message above is the source of truth.',
     translationUnavailable: 'A translation is not available right now. The official message is shown above.',
     sourceLabel: 'Source',
+    pause: 'Pause',
+    resume: 'Continue',
+    replay: 'Play again',
+    paused: 'Paused',
+    readingAloud: 'Reading aloud',
+    speechNotSupported: 'This browser cannot read text aloud.',
   },
 }

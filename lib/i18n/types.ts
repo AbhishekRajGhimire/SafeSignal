@@ -99,6 +99,12 @@ export const UI_KEYS = [
   'explanationNote',
   'translationUnavailable',
   'sourceLabel',
+  'pause',
+  'resume',
+  'replay',
+  'paused',
+  'readingAloud',
+  'speechNotSupported',
 ] as const
 
 export type UIKey = (typeof UI_KEYS)[number]

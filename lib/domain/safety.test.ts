@@ -130,3 +130,64 @@ describe('the language layer never replaces the official message', () => {
     }
   })
 })
+
+describe('speech never replaces the text', () => {
+  const controls = readFileSync('components/speech/SpeechControls.tsx', 'utf8')
+  const emergency = readFileSync('components/warning/EmergencyWarning.tsx', 'utf8')
+
+  it('renders the controls beside the warning, never instead of it', () => {
+    // The meaning, the place and the action are all rendered unconditionally;
+    // the speech controls are a sibling, not a replacement.
+    expect(emergency).toContain('emergency__meaning')
+    expect(emergency).toContain('<SpeechControls')
+    expect(emergency).not.toMatch(/\?\s*<SpeechControls/)
+  })
+
+  it('never hides text when audio is available', () => {
+    // Nothing in the speech controls sets display:none or hides content, and
+    // no component conditions text on speech support.
+    expect(controls).not.toMatch(/display:\s*['"]none['"]/)
+    expect(emergency).not.toMatch(/support\s*===/)
+  })
+
+  it('speaks only SafeSignal-authored rendering, never the official block', () => {
+    // speechText is built from the phrase pack in render.ts. The official
+    // wording is shown as text and never sent to the synthesiser.
+    expect(emergency).toContain('view.speechText')
+    expect(emergency).not.toMatch(/SpeechControls[^>]*officialText/)
+  })
+
+  it('states plainly when speech is unavailable rather than showing a dead button', () => {
+    expect(controls).toContain('speechNotSupported')
+    expect(controls).toContain('audioUnavailable')
+  })
+
+  it('offers pause, resume, replay and stop as real buttons', () => {
+    for (const control of ['pause', 'resume', 'replay', 'stop']) {
+      expect(controls, control).toContain(`engine?.${control}()`)
+    }
+    // Native buttons, so keyboard and assistive access come from the platform.
+    expect(controls).not.toMatch(/role=['"]button['"]/)
+  })
+})
+
+describe('the playing indicator survives every accessibility setting', () => {
+  const css = readFileSync('app/globals.css', 'utf8')
+
+  it('holds a visible state when motion is suppressed', () => {
+    const reduced = css.slice(css.indexOf('@media (prefers-reduced-motion: reduce)'))
+    expect(reduced).toContain('.speech__bars--on span')
+  })
+
+  it('animates only behind a no-preference query', () => {
+    const animated = css.indexOf('.speech__bars--on span { animation')
+    const guard = css.lastIndexOf('@media (prefers-reduced-motion: no-preference)', animated)
+    expect(guard).toBeGreaterThan(-1)
+  })
+
+  it('carries a word as well as a shape, so colour is never the only signal', () => {
+    const controls = readFileSync('components/speech/SpeechControls.tsx', 'utf8')
+    expect(controls).toContain('pack.ui.readingAloud')
+    expect(controls).toContain('pack.ui.paused')
+  })
+})

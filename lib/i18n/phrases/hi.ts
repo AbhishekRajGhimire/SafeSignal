@@ -143,5 +143,11 @@ export const hi: PhrasePack = {
     explanationNote: 'SafeSignal द्वारा अनुवादित और सरल किया गया। ऊपर दिया आधिकारिक संदेश ही मान्य है।',
     translationUnavailable: 'अभी अनुवाद उपलब्ध नहीं है। ऊपर आधिकारिक संदेश दिखाया गया है।',
     sourceLabel: 'स्रोत',
+    pause: 'रोकें',
+    resume: 'जारी रखें',
+    replay: 'फिर से चलाएँ',
+    paused: 'रुका हुआ',
+    readingAloud: 'बोलकर पढ़ा जा रहा है',
+    speechNotSupported: 'यह ब्राउज़र टेक्स्ट बोलकर नहीं पढ़ सकता।',
   },
 }

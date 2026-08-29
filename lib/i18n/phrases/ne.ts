@@ -149,5 +149,11 @@ export const ne: PhrasePack = {
     explanationNote: 'SafeSignal ले अनुवाद र सरल बनाएको। माथिको आधिकारिक सन्देश नै आधिकारिक हो।',
     translationUnavailable: 'अहिले अनुवाद उपलब्ध छैन। माथि आधिकारिक सन्देश देखाइएको छ।',
     sourceLabel: 'स्रोत',
+    pause: 'रोक्नुहोस्',
+    resume: 'जारी राख्नुहोस्',
+    replay: 'फेरि बजाउनुहोस्',
+    paused: 'रोकिएको',
+    readingAloud: 'बोलेर सुनाउँदै',
+    speechNotSupported: 'यो ब्राउजरले पाठ बोलेर सुनाउन सक्दैन।',
   },
 }

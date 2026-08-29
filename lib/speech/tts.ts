@@ -1,24 +1,18 @@
-export interface SpeechCapability {
-  supported: boolean
-  hasVoice: boolean
-}
+import { SpeechEngine, type SynthLike, type UtteranceLike } from './engine'
 
-/** Slower than default. Comprehension matters more than speed here. */
-const RATE = 0.9
+export { splitForSpeech, pickVoice, RATE } from './engine'
+export type { SpeechState, SpeechStatus } from './engine'
 
-const baseLanguage = (tag: string): string =>
-  tag.replace('_', '-').split('-')[0].toLowerCase()
+export type SpeechSupport =
+  /** The browser has no speech synthesis at all. */
+  | 'unsupported'
+  /** Supported, but no voice exists for the requested language. */
+  | 'no-voice'
+  | 'ready'
 
-export function pickVoice(
-  voices: SpeechSynthesisVoice[],
-  locale: string,
-): SpeechSynthesisVoice | null {
-  const wanted = locale.replace('_', '-').toLowerCase()
-  const exact = voices.find((v) => v.lang.replace('_', '-').toLowerCase() === wanted)
-  if (exact) return exact
-
-  const sameLanguage = voices.find((v) => baseLanguage(v.lang) === baseLanguage(locale))
-  return sameLanguage ?? null
+function synthesis(): SpeechSynthesis | null {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null
+  return window.speechSynthesis
 }
 
 /**
@@ -27,55 +21,73 @@ export function pickVoice(
  * browser that never fires it cannot hang the caller.
  */
 export function getVoicesAsync(timeoutMs = 1500): Promise<SpeechSynthesisVoice[]> {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    return Promise.resolve([])
-  }
+  const synth = synthesis()
+  if (!synth) return Promise.resolve([])
 
-  const synth = window.speechSynthesis
   const immediate = synth.getVoices()
   if (immediate.length > 0) return Promise.resolve(immediate)
 
   return new Promise((resolve) => {
     let settled = false
-
     const finish = () => {
       if (settled) return
       settled = true
       synth.removeEventListener('voiceschanged', finish)
       resolve(synth.getVoices())
     }
-
     synth.addEventListener('voiceschanged', finish)
     setTimeout(finish, timeoutMs)
   })
 }
 
-export async function checkCapability(locale: string): Promise<SpeechCapability> {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-    return { supported: false, hasVoice: false }
-  }
+export async function checkSupport(locale: string): Promise<SpeechSupport> {
+  const synth = synthesis()
+  if (!synth) return 'unsupported'
   const voices = await getVoicesAsync()
-  return { supported: true, hasVoice: pickVoice(voices, locale) !== null }
+  const base = locale.split('-')[0].toLowerCase()
+  const match = voices.some((v) => v.lang.replace('_', '-').toLowerCase().startsWith(base))
+  return match ? 'ready' : 'no-voice'
+}
+
+/**
+ * One engine for the whole page.
+ *
+ * There is a single synthesiser in the browser, so there must be a single
+ * owner of it. Two components each calling speak() would cancel each other,
+ * which is what the previous build did when auto-play and the button ran at
+ * the same time.
+ */
+let engine: SpeechEngine | null = null
+
+export function getSpeechEngine(): SpeechEngine | null {
+  const synth = synthesis()
+  if (!synth) return null
+  if (engine) return engine
+
+  const adapter: SynthLike = {
+    speak: (u) => synth.speak(u as unknown as SpeechSynthesisUtterance),
+    cancel: () => synth.cancel(),
+    pause: () => synth.pause(),
+    resume: () => synth.resume(),
+    getVoices: () => synth.getVoices(),
+  }
+
+  engine = new SpeechEngine(
+    adapter,
+    (text) => new SpeechSynthesisUtterance(text) as unknown as UtteranceLike,
+  )
+  return engine
+}
+
+export function __resetEngineForTests(): void {
+  engine = null
 }
 
 export function stopSpeaking(): void {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-  window.speechSynthesis.cancel()
+  getSpeechEngine()?.stop()
 }
 
-export async function speak(text: string, locale: string): Promise<void> {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
-  if (!text.trim()) return
-
-  const voices = await getVoicesAsync()
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = locale
-  utterance.rate = RATE
-
-  const voice = pickVoice(voices, locale)
-  if (voice) utterance.voice = voice
-
-  // Cancel first: queued utterances otherwise stack up on repeated taps.
-  window.speechSynthesis.cancel()
-  window.speechSynthesis.speak(utterance)
+/** Convenience for callers that only want to start playback. */
+export function speak(text: string, locale: string): void {
+  getSpeechEngine()?.speak(text, locale)
 }

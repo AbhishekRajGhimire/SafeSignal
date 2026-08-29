@@ -143,5 +143,11 @@ export const vi: PhrasePack = {
     explanationNote: 'Do SafeSignal dịch và đơn giản hoá. Thông điệp chính thức ở trên mới là căn cứ.',
     translationUnavailable: 'Hiện chưa có bản dịch. Thông điệp chính thức được hiển thị ở trên.',
     sourceLabel: 'Nguồn',
+    pause: 'Tạm dừng',
+    resume: 'Tiếp tục',
+    replay: 'Phát lại',
+    paused: 'Đã tạm dừng',
+    readingAloud: 'Đang đọc to',
+    speechNotSupported: 'Trình duyệt này không đọc được văn bản.',
   },
 }
