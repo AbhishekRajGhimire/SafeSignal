@@ -135,5 +135,8 @@ export const zh: PhrasePack = {
     reasonOutOfDate: '此信息可能已过时。',
     reasonNoData: '我们无法连接官方信息源。',
     checkOfficial: '请查看新南威尔士州消防局官方信息',
+    loadingTitle: '正在准备您的设置',
+    warningChanged: '此警报已更新',
+    otherWarnings: '您附近的其他警报',
   },
 }

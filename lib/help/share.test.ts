@@ -34,6 +34,9 @@ const relevant: RelevantWarning = {
   distanceKm: 2.1,
   inside: false,
   band: 'very-close',
+  verdict: 'not-currently-affected' as const,
+  reason: 'outside-polygon' as const,
+  rejectedRings: 0,
 }
 
 afterEach(() => vi.unstubAllGlobals())

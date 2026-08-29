@@ -27,6 +27,9 @@ const relevant: RelevantWarning = {
   distanceKm: 4.8,
   inside: false,
   band: 'very-close',
+  verdict: 'not-currently-affected' as const,
+  reason: 'outside-polygon' as const,
+  rejectedRings: 0,
 }
 
 describe('renderWarning', () => {

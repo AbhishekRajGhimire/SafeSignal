@@ -141,5 +141,8 @@ export const ne: PhrasePack = {
     reasonOutOfDate: 'यो जानकारी पुरानो हुन सक्छ।',
     reasonNoData: 'हामी आधिकारिक स्रोतसम्म पुग्न सकेनौं।',
     checkOfficial: 'NSW RFS को आधिकारिक जानकारी हेर्नुहोस्',
+    loadingTitle: 'तपाईंको सेटिङ तयार गर्दै',
+    warningChanged: 'यो चेतावनी बदलिएको छ',
+    otherWarnings: 'तपाईंको नजिकका अन्य चेतावनी',
   },
 }

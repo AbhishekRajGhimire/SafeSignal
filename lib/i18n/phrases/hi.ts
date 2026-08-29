@@ -135,5 +135,8 @@ export const hi: PhrasePack = {
     reasonOutOfDate: 'यह जानकारी पुरानी हो सकती है।',
     reasonNoData: 'हम आधिकारिक स्रोत तक नहीं पहुँच सके।',
     checkOfficial: 'NSW RFS की आधिकारिक जानकारी देखें',
+    loadingTitle: 'आपकी सेटिंग तैयार की जा रही है',
+    warningChanged: 'यह चेतावनी बदल गई है',
+    otherWarnings: 'आपके पास की अन्य चेतावनियाँ',
   },
 }

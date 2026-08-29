@@ -144,5 +144,8 @@ export const ar: PhrasePack = {
     reasonOutOfDate: 'قد تكون هذه المعلومات قديمة.',
     reasonNoData: 'لم نتمكّن من الوصول إلى المصدر الرسمي.',
     checkOfficial: 'راجع المعلومات الرسمية لـ NSW RFS',
+    loadingTitle: 'نجهّز إعداداتك',
+    warningChanged: 'تغيّر هذا التحذير',
+    otherWarnings: 'تحذيرات أخرى قريبة منك',
   },
 }

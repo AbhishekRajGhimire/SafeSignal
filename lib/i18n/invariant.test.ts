@@ -52,6 +52,9 @@ const relevantAt = (level: AlertLevel): RelevantWarning => ({
   distanceKm: 2.1,
   inside: false,
   band: 'very-close',
+  verdict: 'not-currently-affected' as const,
+  reason: 'outside-polygon' as const,
+  rejectedRings: 0,
 })
 
 /** Every profile a person can actually produce through the setup flow. */

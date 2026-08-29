@@ -91,6 +91,9 @@ export const UI_KEYS = [
   'reasonOutOfDate',
   'reasonNoData',
   'checkOfficial',
+  'loadingTitle',
+  'warningChanged',
+  'otherWarnings',
 ] as const
 
 export type UIKey = (typeof UI_KEYS)[number]

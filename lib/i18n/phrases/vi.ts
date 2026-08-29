@@ -135,5 +135,8 @@ export const vi: PhrasePack = {
     reasonOutOfDate: 'Thông tin này có thể đã cũ.',
     reasonNoData: 'Chúng tôi không kết nối được nguồn chính thức.',
     checkOfficial: 'Xem thông tin chính thức của NSW RFS',
+    loadingTitle: 'Đang chuẩn bị cài đặt của bạn',
+    warningChanged: 'Cảnh báo này đã thay đổi',
+    otherWarnings: 'Các cảnh báo khác gần bạn',
   },
 }

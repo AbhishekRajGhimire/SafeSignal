@@ -16,3 +16,7 @@ coverage/
 *.key
 tmp/
 .claude/local/
+
+# Local Claude Code tooling, not part of the product
+.claude/
+CLAUDE.md

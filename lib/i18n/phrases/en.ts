@@ -135,5 +135,8 @@ export const en: PhrasePack = {
     reasonOutOfDate: 'This information may be out of date.',
     reasonNoData: 'We could not reach the official feed.',
     checkOfficial: 'Check the official NSW RFS information',
+    loadingTitle: 'Getting your settings ready',
+    warningChanged: 'This warning has changed',
+    otherWarnings: 'Other warnings near you',
   },
 }
