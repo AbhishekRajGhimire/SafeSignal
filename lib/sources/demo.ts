@@ -107,7 +107,8 @@ export class DemoSource implements WarningSource {
    * produces genuine level-changed events rather than a scripted animation.
    */
   private currentFeed(): WarningFeed {
-    const warnings = this.steps[this.stepIndex]?.warnings ?? []
+    const step = this.steps[this.stepIndex]
+    const warnings = step?.warnings ?? []
     const previous = this.emitted ? this.previous : []
     const changes = this.emitted ? diffWarnings(previous, warnings) : []
     this.previous = warnings
@@ -115,11 +116,13 @@ export class DemoSource implements WarningSource {
     return {
       warnings,
       fetchedAt: new Date(),
-      stale: false,
-      freshness: 'fresh',
+      // A scenario may simulate the feed itself degrading, so the stale and
+      // error screens can be rehearsed without unplugging anything.
+      stale: step?.feedState?.stale ?? false,
+      freshness: step?.feedState?.freshness ?? 'fresh',
       changes,
       previous,
-      failure: null,
+      failure: step?.feedState?.failure ?? null,
       dropped: 0,
       duplicates: 0,
     }

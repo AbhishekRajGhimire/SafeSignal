@@ -932,3 +932,33 @@ p { margin: 0 0 var(--space-2); }
   margin-bottom: var(--space-1);
   line-height: var(--leading-body);
 }
+
+/* ---------- Presenter demo controls ---------- */
+
+.democtl {
+  margin-top: var(--space-5);
+  padding: var(--space-3);
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+}
+
+.democtl__title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-secondary);
+  margin: 0 0 var(--space-2);
+}
+
+.democtl__scenarios { margin-bottom: var(--space-2); }
+.democtl__scenarios .choice { width: 100%; text-align: start; }
+
+.democtl__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.democtl__row .button { width: auto; flex: 1 1 auto; }

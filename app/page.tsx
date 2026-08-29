@@ -31,7 +31,7 @@ const sydneyTime = new Intl.DateTimeFormat('en-GB', {
 export default function Home() {
   const { profile, ready } = useProfile()
   const pack = usePack()
-  const { feed, demo, demoState, demoMode, setDemoMode } = useWarnings()
+  const { feed, demoMode, setDemoMode } = useWarnings()
 
   const assessment = assess(feed.warnings, profile.location, feed.freshness)
   const state = screenStateFrom({
@@ -129,7 +129,7 @@ export default function Home() {
           </section>
         )}
 
-        {demo && demoState && <DemoControls demo={demo} state={demoState} />}
+        {demoMode && <DemoControls />}
 
         {/* Freshness is never optional: silent staleness is the dangerous
             failure, so it sits on every screen regardless of state. */}

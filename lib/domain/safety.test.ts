@@ -191,3 +191,37 @@ describe('the playing indicator survives every accessibility setting', () => {
     expect(controls).toContain('pack.ui.paused')
   })
 })
+
+describe('demo data never mixes with live data', () => {
+  it('routes demo warnings through a source, never into the live pipeline', () => {
+    // The RFS pipeline builds warnings only from a fetched payload. If the
+    // scenario module were ever imported there, simulated warnings could
+    // reach a live feed.
+    for (const file of ['lib/rfs/fetch.ts', 'lib/rfs/normalize.ts', 'app/api/warnings/route.ts']) {
+      expect(readFileSync(file, 'utf8'), file).not.toContain('sources/scenario')
+    }
+  })
+
+  it('subscribes to exactly one source at a time', () => {
+    const provider = readFileSync('components/WarningProvider.tsx', 'utf8')
+    // LiveSource is constructed only on the branch where there is no demo.
+    expect(provider).toMatch(/if \(demo\) \{/)
+    expect(provider).toMatch(/const live = new LiveSource\(\)/)
+    const demoBranch = provider.indexOf('if (demo) {')
+    const liveConstruct = provider.indexOf('new LiveSource()')
+    expect(liveConstruct).toBeGreaterThan(demoBranch)
+  })
+
+  it('labels every simulated warning as simulated at the source', () => {
+    const scenario = readFileSync('lib/sources/scenario.ts', 'utf8')
+    expect(scenario).toContain('SIMULATED')
+    expect(scenario).toContain('Simulated data for demonstration only')
+    // Every demo warning is built by the one factory that attaches it.
+    expect(scenario).toContain('provenance: DEMO_PROVENANCE')
+  })
+
+  it('keeps the simulated-data banner unconditional in demo mode', () => {
+    const page = readFileSync('app/page.tsx', 'utf8')
+    expect(page).toMatch(/demoMode && <div className="banner banner--demo">/)
+  })
+})

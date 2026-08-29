@@ -1,10 +1,19 @@
 import type { LatLon, Warning, WarningProvenance } from '@/lib/domain/warning'
+import type { Freshness } from '@/lib/domain/freshness'
+import type { FeedFailure } from '@/lib/rfs/fetch'
+import type { UserProfile } from '@/lib/domain/profile'
 import { FEED_SOURCE } from '@/lib/rfs/normalize'
 
 export interface ScenarioStep {
   atMs: number
   label: string
   warnings: Warning[]
+  /** Lets a scenario simulate the feed itself degrading, not just its content. */
+  feedState?: {
+    stale?: boolean
+    freshness?: Freshness
+    failure?: FeedFailure | null
+  }
 }
 
 /** Roughly one kilometre of latitude. */
@@ -48,9 +57,10 @@ function demoWarning(
   fields: Pick<Warning, 'level' | 'status' | 'sizeHa' | 'rawAdvice'>,
   minute: number,
   polygons: Warning['polygons'] = [],
+  id = 'safesignal-demo-incident',
 ): Warning {
   return {
-    id: 'safesignal-demo-incident',
+    id,
     title: `GREEN GULLY TRAIL, ${anchorLabel.toUpperCase()}`,
     location: `Green Gully Trail, ${anchorLabel}`,
     council: 'Blue Mountains',
@@ -117,6 +127,139 @@ export function buildScenario(anchor: LatLon, anchorLabel: string): ScenarioStep
             'If you are not prepared, leave now towards the east.',
         }, 41, [ringAround(anchor, 3)]),
       ],
+    },
+    {
+      // The level holds while the fire grows. This step exists so the demo
+      // can show the difference between a warning being updated and a
+      // warning escalating: the diff engine reports one and not the other.
+      atMs: 55_000,
+      label: 'Updated, same level',
+      warnings: [
+        demoWarning(anchor, anchorLabel, 2, {
+          level: 'emergency-warning',
+          status: 'Out of control',
+          sizeHa: 1_450,
+          rawAdvice:
+            'You are in danger and need to act immediately to survive. ' +
+            'The fire has grown and conditions remain dangerous. ' +
+            'If you are not prepared, leave now towards the east.',
+        }, 58, [ringAround(anchor, 5)]),
+      ],
+    },
+  ]
+}
+
+/* ------------------------------------------------------------------ *
+ * The six rehearsable scenarios
+ *
+ * Every warning in every scenario goes through demoWarning(), so every one
+ * carries the SIMULATED provenance and a safesignal-demo id. Demo data and
+ * live data can never mix: the WarningSource seam means the application is
+ * subscribed to exactly one of DemoSource or LiveSource at a time.
+ * ------------------------------------------------------------------ */
+
+export interface DemoScenario {
+  id: DemoScenarioId
+  /** Presenter-facing name. The audience sees the product, not this. */
+  name: string
+  steps: ScenarioStep[]
+  /**
+   * A profile this scenario demonstrates. Applied on selection and restored
+   * on reset or on leaving demo mode; the person's real profile survives.
+   */
+  profilePreset?: Partial<UserProfile>
+}
+
+export type DemoScenarioId =
+  | 'no-warning'
+  | 'emergency-here'
+  | 'escalation'
+  | 'not-affected'
+  | 'feed-loss'
+  | 'accessibility-profile'
+
+export function buildScenarios(anchor: LatLon, anchorLabel: string): DemoScenario[] {
+  const emergencyHere = (minute: number) =>
+    demoWarning(anchor, anchorLabel, 2, {
+      level: 'emergency-warning',
+      status: 'Out of control',
+      sizeHa: 840,
+      rawAdvice:
+        'You are in danger and need to act immediately to survive. ' +
+        'The fire is approaching and conditions are dangerous. ' +
+        'If you are not prepared, leave now towards the east.',
+    }, minute, [ringAround(anchor, 3)])
+
+  return [
+    {
+      id: 'no-warning',
+      name: '1 · No active warning',
+      steps: [{ atMs: 0, label: 'Quiet', warnings: [] }],
+    },
+    {
+      id: 'emergency-here',
+      name: '2 · Emergency at your location',
+      steps: [{ atMs: 0, label: 'Emergency Warning', warnings: [emergencyHere(0)] }],
+    },
+    {
+      id: 'escalation',
+      name: '3 · Warning changes',
+      steps: buildScenario(anchor, anchorLabel),
+    },
+    {
+      id: 'not-affected',
+      name: '4 · Warning elsewhere',
+      steps: [{
+        atMs: 0,
+        label: 'Not affected',
+        warnings: [
+          // ~25 km north, with a polygon that excludes the anchor: close
+          // enough to surface, far enough that the verdict is a clean
+          // "no official warning covers your location".
+          demoWarning(anchor, anchorLabel, 25, {
+            level: 'emergency-warning',
+            status: 'Out of control',
+            sizeHa: 300,
+            rawAdvice: 'A fire is burning north of the area.',
+          }, 0, [ringAround({ lat: anchor.lat + 25 * KM_IN_DEGREES, lon: anchor.lon }, 3)],
+          'safesignal-demo-elsewhere'),
+        ],
+      }],
+    },
+    {
+      id: 'feed-loss',
+      name: '5 · Feed becomes unavailable',
+      steps: [
+        {
+          atMs: 0,
+          label: 'Fresh data',
+          warnings: [],
+        },
+        {
+          atMs: 8_000,
+          label: 'Data going stale',
+          warnings: [],
+          feedState: { stale: true, freshness: 'stale' },
+        },
+        {
+          atMs: 16_000,
+          label: 'Feed unreachable',
+          warnings: [],
+          feedState: { stale: true, freshness: 'stale', failure: 'network' },
+        },
+      ],
+    },
+    {
+      id: 'accessibility-profile',
+      name: '6 · Mandarin · large text · audio · mobility',
+      steps: [{ atMs: 0, label: 'Emergency Warning', warnings: [emergencyHere(0)] }],
+      profilePreset: {
+        language: 'zh',
+        textSize: 'large',
+        audio: true,
+        needs: ['mobility'],
+        transport: 'needs-assistance',
+      },
     },
   ]
 }
