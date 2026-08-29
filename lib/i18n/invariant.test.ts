@@ -11,6 +11,7 @@ import {
 } from '@/lib/domain/profile'
 import { ALERT_LEVELS, type AlertLevel, type Warning } from '@/lib/domain/warning'
 import type { RelevantWarning } from '@/lib/domain/match'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 /**
  * THE INVARIANT
@@ -40,6 +41,9 @@ function warningAt(level: AlertLevel): Warning {
     polygons: [],
     officialUrl: 'https://www.rfs.nsw.gov.au/fire-information/fires-near-me',
     rawAdvice: 'You are in danger and need to act immediately to survive.',
+    fields: {},
+    raw: { properties: {}, geometry: null },
+    provenance: makeWarning().provenance,
   }
 }
 

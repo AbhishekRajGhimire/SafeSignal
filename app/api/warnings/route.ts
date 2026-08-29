@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getFeed, type WarningsResponse } from '@/lib/rfs/fetch'
+import { FEED_SOURCE } from '@/lib/rfs/normalize'
 import { toWire } from '@/lib/domain/warning'
 
 export const dynamic = 'force-dynamic'
@@ -17,6 +18,16 @@ export async function GET() {
     fetchedAt: snapshot.fetchedAt ? snapshot.fetchedAt.toISOString() : null,
     stale: snapshot.stale,
     dropped: snapshot.dropped,
+    duplicates: snapshot.duplicates,
+    failure: snapshot.failure,
+    feedLastModified: snapshot.feedLastModified
+      ? snapshot.feedLastModified.toISOString()
+      : null,
+    source: {
+      name: FEED_SOURCE.sourceName,
+      url: FEED_SOURCE.feedUrl,
+      copyright: FEED_SOURCE.copyright,
+    },
   }
 
   return NextResponse.json(body, {

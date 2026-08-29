@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { matchWarnings, SURFACE_RADIUS_KM } from './match'
 import type { AlertLevel, Warning } from './warning'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const KATOOMBA = { lat: -33.7128, lon: 150.3119 }
 
@@ -19,6 +20,9 @@ function warning(overrides: Partial<Warning> & { id: string; level: AlertLevel }
     polygons: [],
     officialUrl: 'https://example.invalid',
     rawAdvice: null,
+    fields: {},
+    raw: { properties: {}, geometry: null },
+    provenance: makeWarning().provenance,
     ...overrides,
   }
 }

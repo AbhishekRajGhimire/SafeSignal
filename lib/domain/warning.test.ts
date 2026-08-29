@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { toWire, fromWire, isSurfaceable, SEVERITY, type Warning } from './warning'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const sample: Warning = {
   id: 'incident-1',
@@ -17,6 +18,9 @@ const sample: Warning = {
   polygons: [[{ lat: -28.8, lon: 153.2 }, { lat: -28.81, lon: 153.21 }, { lat: -28.82, lon: 153.2 }]],
   officialUrl: 'https://www.rfs.nsw.gov.au/fire-information/fires-near-me',
   rawAdvice: null,
+  fields: {},
+  raw: { properties: {}, geometry: null },
+  provenance: makeWarning().provenance,
 }
 
 describe('wire conversion', () => {

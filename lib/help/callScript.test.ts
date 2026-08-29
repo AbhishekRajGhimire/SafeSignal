@@ -8,6 +8,7 @@ import {
   type UserProfile,
 } from '@/lib/domain/profile'
 import type { Warning } from '@/lib/domain/warning'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const katoomba = { lat: -33.7128, lon: 150.3119, label: 'Katoomba' }
 
@@ -33,6 +34,9 @@ const warning: Warning = {
   polygons: [],
   officialUrl: 'https://example.invalid',
   rawAdvice: null,
+  fields: {},
+  raw: { properties: {}, geometry: null },
+  provenance: makeWarning().provenance,
 }
 
 describe('buildCallScript', () => {

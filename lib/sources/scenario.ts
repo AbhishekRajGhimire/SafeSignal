@@ -1,4 +1,5 @@
-import type { LatLon, Warning } from '@/lib/domain/warning'
+import type { LatLon, Warning, WarningProvenance } from '@/lib/domain/warning'
+import { FEED_SOURCE } from '@/lib/rfs/normalize'
 
 export interface ScenarioStep {
   atMs: number
@@ -10,6 +11,34 @@ export interface ScenarioStep {
 const KM_IN_DEGREES = 0.009
 
 const BASE = new Date('2026-11-14T03:00:00.000Z')
+
+/**
+ * Demo warnings are simulated and say so in their provenance, so nothing
+ * downstream can mistake them for issued RFS content.
+ */
+const DEMO_PROVENANCE: WarningProvenance = {
+  ...FEED_SOURCE,
+  sourceName: 'SIMULATED — not issued by the NSW Rural Fire Service',
+  copyright: 'Simulated data for demonstration only',
+  retrievedAt: BASE,
+  feedLastModified: null,
+  transform: 'normalized',
+}
+
+/**
+ * A ring roughly one kilometre across, centred on the anchor, so demo mode
+ * exercises the real polygon-containment path rather than skipping it.
+ */
+function ringAround(centre: LatLon, halfKm: number) {
+  const d = halfKm * KM_IN_DEGREES
+  return [
+    { lat: centre.lat - d, lon: centre.lon - d },
+    { lat: centre.lat - d, lon: centre.lon + d },
+    { lat: centre.lat + d, lon: centre.lon + d },
+    { lat: centre.lat + d, lon: centre.lon - d },
+    { lat: centre.lat - d, lon: centre.lon - d },
+  ]
+}
 const minutesAfter = (minutes: number) => new Date(BASE.getTime() + minutes * 60_000)
 
 function demoWarning(
@@ -18,6 +47,7 @@ function demoWarning(
   distanceKm: number,
   fields: Pick<Warning, 'level' | 'status' | 'sizeHa' | 'rawAdvice'>,
   minute: number,
+  polygons: Warning['polygons'] = [],
 ): Warning {
   return {
     id: 'safesignal-demo-incident',
@@ -29,8 +59,11 @@ function demoWarning(
     updatedAt: minutesAfter(minute),
     publishedAt: BASE,
     point: { lat: anchor.lat + distanceKm * KM_IN_DEGREES, lon: anchor.lon },
-    polygons: [],
+    polygons,
     officialUrl: 'https://www.rfs.nsw.gov.au/fire-information/fires-near-me',
+    fields: {},
+    raw: { properties: { simulated: true }, geometry: null },
+    provenance: DEMO_PROVENANCE,
     ...fields,
   }
 }
@@ -82,7 +115,7 @@ export function buildScenario(anchor: LatLon, anchorLabel: string): ScenarioStep
             'You are in danger and need to act immediately to survive. ' +
             'The fire is approaching and conditions are dangerous. ' +
             'If you are not prepared, leave now towards the east.',
-        }, 41),
+        }, 41, [ringAround(anchor, 3)]),
       ],
     },
   ]

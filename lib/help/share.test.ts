@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { buildShareMessage, shareSituation } from './share'
 import { DEFAULT_PROFILE, type UserProfile } from '@/lib/domain/profile'
 import type { RelevantWarning } from '@/lib/domain/match'
+import { makeWarning } from '@/lib/testing/fixtures'
 
 const profile = (overrides: Partial<UserProfile> = {}): UserProfile => ({
   ...DEFAULT_PROFILE,
@@ -26,6 +27,9 @@ const relevant: RelevantWarning = {
     polygons: [],
     officialUrl: 'https://example.invalid',
     rawAdvice: null,
+    fields: {},
+    raw: { properties: {}, geometry: null },
+    provenance: makeWarning().provenance,
   },
   distanceKm: 2.1,
   inside: false,

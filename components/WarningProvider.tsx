@@ -4,11 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { LiveSource } from '@/lib/sources/live'
 import { DemoSource, type DemoState } from '@/lib/sources/demo'
 import { buildScenario } from '@/lib/sources/scenario'
-import type { WarningFeed } from '@/lib/sources/types'
+import { EMPTY_FEED, type WarningFeed } from '@/lib/sources/types'
 import { DEFAULT_DEMO_PLACE } from '@/lib/locations/nsw'
 import { useProfile } from './ProfileProvider'
-
-const EMPTY: WarningFeed = { warnings: [], fetchedAt: null, stale: false }
 
 interface WarningContextValue {
   feed: WarningFeed
@@ -23,7 +21,7 @@ const WarningContext = createContext<WarningContextValue | null>(null)
 export function WarningProvider({ children }: { children: React.ReactNode }) {
   const { profile, ready } = useProfile()
   const [demoMode, setDemoMode] = useState(false)
-  const [feed, setFeed] = useState<WarningFeed>(EMPTY)
+  const [feed, setFeed] = useState<WarningFeed>(EMPTY_FEED)
   const [demoState, setDemoState] = useState<DemoState | null>(null)
 
   // A judge opening the shared link must reach the scenario without being
