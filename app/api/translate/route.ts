@@ -82,7 +82,12 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 600,
+        // Sized against MAX_SOURCE_CHARS, not against a typical warning.
+        // At 600 this truncated long advice mid-word, because adaptive
+        // thinking draws from the same budget and Devanagari and Arabic
+        // script cost far more tokens per character than Latin. Unused
+        // budget is not billed, so the ceiling is close to free.
+        max_tokens: 4000,
         system: SYSTEM_PROMPT,
         messages: [
           {

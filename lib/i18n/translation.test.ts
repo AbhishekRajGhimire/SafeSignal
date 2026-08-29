@@ -20,6 +20,43 @@ const model = (text: string) => ({
   model: 'claude-sonnet-5',
 })
 
+describe('a response the model ran out of room to finish', () => {
+  // Observed in production: a 1500-character warning translated to Hindi
+  // came back cut off mid-word, and was shown to the reader as if it were
+  // the complete official advice.
+  const truncated = (text: string) => ({ ...model(text), stop_reason: 'max_tokens' })
+
+  it('rejects it even when the text looks like a plausible translation', () => {
+    const outcome = readModelResponse(truncated('你现在有危险，需要立即采取行动。火距离 2 公里，正朝'))
+    expect(outcome).toEqual({ status: 'unavailable', reason: 'truncated' })
+  })
+
+  it('rejects it through acceptTranslation too, not just the reader', () => {
+    const outcome = acceptTranslation(SOURCE, truncated('你现在有危险，需要立即采取行动。'))
+    expect(outcome).toEqual({ status: 'unavailable', reason: 'truncated' })
+  })
+
+  it('catches what the length guard cannot, because expansion hides truncation', () => {
+    // Hindi runs longer than its English source, so a cut-off Hindi
+    // translation still scores inside the accepted 0.2 to 6.0 ratio. The
+    // length guard passes it; only stop_reason catches it.
+    const cutOffHindi = 'आप खतरे में हैं और जीवित रहने के लिए अभी कार्रवाई करनी होगी। आग नज़दीक आ रही है और हाल'
+    expect(verifyTranslation(SOURCE, cutOffHindi)).toBeNull()
+    expect(acceptTranslation(SOURCE, truncated(cutOffHindi))).toEqual({
+      status: 'unavailable',
+      reason: 'truncated',
+    })
+  })
+
+  it('still accepts a complete response that stopped naturally', () => {
+    const complete = {
+      ...model('你现在有危险，需要立即采取行动。火距离 2 公里，正朝 Katoomba 方向移动。如被困请拨打 000。'),
+      stop_reason: 'end_turn',
+    }
+    expect(acceptTranslation(SOURCE, complete).status).toBe('translated')
+  })
+})
+
 describe('successful translation', () => {
   it('accepts a faithful translation that preserves every number', () => {
     const candidate = '你现在有危险，需要立即采取行动。火距离 2 公里，正朝 Katoomba 方向移动。如被困请拨打 000。'

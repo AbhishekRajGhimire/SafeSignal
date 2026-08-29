@@ -32,6 +32,7 @@ export type TranslationFailure =
   | 'network'
   | 'http-error'
   | 'rejected-unsafe'
+  | 'truncated'
 
 export type TranslationOutcome =
   | { status: 'translated'; text: string }
@@ -125,6 +126,17 @@ export function verifyTranslation(source: string, candidate: string): Rejection 
 export function readModelResponse(payload: unknown): TranslationOutcome {
   if (!payload || typeof payload !== 'object') {
     return { status: 'unavailable', reason: 'malformed-response' }
+  }
+
+  // The API says outright when it ran out of budget. That is a definitive
+  // signal and it must be checked before the content is read.
+  //
+  // The length guard below cannot substitute for it: a truncated Hindi or
+  // Arabic translation is still plausibly longer than its English source,
+  // so it scores inside the accepted ratio and is shown to the reader. A
+  // 1500-character warning was observed ending mid-word this way.
+  if ((payload as { stop_reason?: unknown }).stop_reason === 'max_tokens') {
+    return { status: 'unavailable', reason: 'truncated' }
   }
 
   const content = (payload as { content?: unknown }).content
