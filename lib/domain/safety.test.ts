@@ -102,7 +102,7 @@ describe('the language layer never replaces the official message', () => {
   it('always renders the official text, whatever the translation did', () => {
     const source = readFileSync('components/warning/OfficialBlock.tsx', 'utf8')
     // The official <pre> is unconditional; only the explanation is guarded.
-    expect(source).toMatch(/<pre className="message__official" lang="en">/)
+    expect(source).toMatch(/<pre className="message__official" lang="en"/)
     const officialIndex = source.indexOf('message__official')
     const guardIndex = source.indexOf('wantsTranslation &&')
     expect(officialIndex).toBeGreaterThan(-1)

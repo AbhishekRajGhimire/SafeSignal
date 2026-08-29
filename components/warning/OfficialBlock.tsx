@@ -47,7 +47,7 @@ export function OfficialBlock({
           <span className="message__dot" aria-hidden="true" />
           {pack.ui.officialMessageLabel}
         </h3>
-        <pre className="message__official" lang="en">{view.officialText}</pre>
+        <pre className="message__official" lang="en" dir="ltr">{view.officialText}</pre>
       </div>
 
       {/* ---- SafeSignal's explanation, only ever additive ---- */}
