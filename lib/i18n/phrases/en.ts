@@ -149,5 +149,13 @@ export const en: PhrasePack = {
     paused: 'Paused',
     readingAloud: 'Reading aloud',
     speechNotSupported: 'This browser cannot read text aloud.',
+    warningUpdatedTitle: 'Warning updated',
+    whatChanged: 'What changed?',
+    officialWarningUpdated: 'Official warning updated.',
+    changeLevel: 'The warning level changed from {from} to {to}.',
+    changeArea: 'The mapped warning area changed.',
+    changeStatus: 'The fire status changed from {from} to {to}.',
+    changeSize: 'The fire size changed from {from} to {to}.',
+    changeTime: 'The official update time changed to {time}.',
   },
 }

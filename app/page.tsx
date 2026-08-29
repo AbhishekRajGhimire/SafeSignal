@@ -16,6 +16,8 @@ import {
 import { DemoControls } from '@/components/DemoControls'
 import { assess } from '@/lib/domain/match'
 import { screenStateFrom, isEscalation } from '@/lib/domain/screenState'
+import { summariseWarningChange } from '@/lib/domain/changeSummary'
+import { WhatChanged } from '@/components/warning/WhatChanged'
 import { renderWarning } from '@/lib/i18n/render'
 import { getSpeechEngine } from '@/lib/speech/tts'
 
@@ -88,16 +90,16 @@ export default function Home() {
       {demoMode && <div className="banner banner--demo">{pack.ui.demoBanner}</div>}
 
       <main className={`screen${emergency ? ' screen--emergency' : ''}`} id="main">
-        {/* The escalation notice is the one interruption the screen allows,
-            and only for a level that actually rose. */}
-        {state === 'warning-updated' && (
-          <p
-            className="changed"
-            role="status"
-            aria-live={isEscalation(feed.changes) ? 'assertive' : 'polite'}
-          >
-            {pack.ui.warningChanged}
-          </p>
+        {/* The change summary is the one interruption the screen allows.
+            It says what changed; it never says what to do about it. */}
+        {state === 'warning-updated' && top && (
+          <WhatChanged
+            details={summariseWarningChange(
+              feed.previous.find((w) => w.id === top.warning.id),
+              top.warning,
+            )}
+            assertive={isEscalation(feed.changes)}
+          />
         )}
 
         {emergency && top ? (

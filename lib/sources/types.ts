@@ -11,6 +11,8 @@ export interface WarningFeed {
   freshness: Freshness
   /** What changed since the previous emission. Empty on the first one. */
   changes: WarningChange[]
+  /** The warnings from the previous emission, for describing the changes. */
+  previous: Warning[]
   /** Why the last read failed, when it did. Null on success. */
   failure: FeedFailure | null
   dropped: number
@@ -32,6 +34,7 @@ export const EMPTY_FEED: WarningFeed = {
   stale: false,
   freshness: 'unavailable',
   changes: [],
+  previous: [],
   failure: null,
   dropped: 0,
   duplicates: 0,

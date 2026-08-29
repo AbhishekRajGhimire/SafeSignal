@@ -149,5 +149,13 @@ export const hi: PhrasePack = {
     paused: 'रुका हुआ',
     readingAloud: 'बोलकर पढ़ा जा रहा है',
     speechNotSupported: 'यह ब्राउज़र टेक्स्ट बोलकर नहीं पढ़ सकता।',
+    warningUpdatedTitle: 'चेतावनी अपडेट हुई',
+    whatChanged: 'क्या बदला?',
+    officialWarningUpdated: 'आधिकारिक चेतावनी अपडेट हुई है।',
+    changeLevel: 'चेतावनी का स्तर {from} से {to} हो गया।',
+    changeArea: 'नक्शे में दिखाया गया चेतावनी क्षेत्र बदल गया है।',
+    changeStatus: 'आग की स्थिति {from} से {to} हो गई।',
+    changeSize: 'आग का क्षेत्रफल {from} से {to} हो गया।',
+    changeTime: 'आधिकारिक अपडेट समय {time} हो गया।',
   },
 }

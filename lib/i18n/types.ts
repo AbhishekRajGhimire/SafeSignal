@@ -105,6 +105,14 @@ export const UI_KEYS = [
   'paused',
   'readingAloud',
   'speechNotSupported',
+  'warningUpdatedTitle',
+  'whatChanged',
+  'officialWarningUpdated',
+  'changeLevel',
+  'changeArea',
+  'changeStatus',
+  'changeSize',
+  'changeTime',
 ] as const
 
 export type UIKey = (typeof UI_KEYS)[number]

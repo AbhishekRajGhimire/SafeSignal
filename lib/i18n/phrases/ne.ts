@@ -155,5 +155,13 @@ export const ne: PhrasePack = {
     paused: 'रोकिएको',
     readingAloud: 'बोलेर सुनाउँदै',
     speechNotSupported: 'यो ब्राउजरले पाठ बोलेर सुनाउन सक्दैन।',
+    warningUpdatedTitle: 'चेतावनी अद्यावधिक भयो',
+    whatChanged: 'के बदलियो?',
+    officialWarningUpdated: 'आधिकारिक चेतावनी अद्यावधिक भएको छ।',
+    changeLevel: 'चेतावनीको स्तर {from} बाट {to} भयो।',
+    changeArea: 'नक्सामा देखाइएको चेतावनी क्षेत्र बदलिएको छ।',
+    changeStatus: 'आगोको अवस्था {from} बाट {to} भयो।',
+    changeSize: 'आगोको क्षेत्रफल {from} बाट {to} भयो।',
+    changeTime: 'आधिकारिक अद्यावधिक समय {time} भयो।',
   },
 }

@@ -149,5 +149,13 @@ export const zh: PhrasePack = {
     paused: '已暂停',
     readingAloud: '正在朗读',
     speechNotSupported: '此浏览器无法朗读文字。',
+    warningUpdatedTitle: '警报已更新',
+    whatChanged: '有什么变化？',
+    officialWarningUpdated: '官方警报已更新。',
+    changeLevel: '警报级别从{from}变为{to}。',
+    changeArea: '官方标注的警报范围发生了变化。',
+    changeStatus: '火情状态从{from}变为{to}。',
+    changeSize: '过火面积从{from}变为{to}。',
+    changeTime: '官方更新时间变为{time}。',
   },
 }

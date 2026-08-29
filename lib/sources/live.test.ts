@@ -190,3 +190,33 @@ describe('LiveSource lifecycle events', () => {
     expect(received[1].warnings).toHaveLength(1)
   })
 })
+
+describe('the previous snapshot travels with the changes', () => {
+  it('is empty on the baseline emission', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => response }))
+    const received: WarningFeed[] = []
+    const source = new LiveSource(60_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    stop()
+    expect(received[0].previous).toEqual([])
+  })
+
+  it('carries the warnings the diff was computed against', async () => {
+    const spy = vi
+      .fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => response })
+      .mockResolvedValueOnce({ ok: true, json: async () => escalated })
+    vi.stubGlobal('fetch', spy)
+    const received: WarningFeed[] = []
+    const source = new LiveSource(1_000)
+    const stop = source.subscribe((feed) => received.push(feed))
+    await vi.advanceTimersByTimeAsync(0)
+    await vi.advanceTimersByTimeAsync(1_000)
+    stop()
+    // The second emission's previous is the first emission's warnings, so a
+    // consumer can say "changed from Advice" rather than only "changed".
+    expect(received[1].previous.map((w) => w.level)).toEqual(['advice'])
+    expect(received[1].warnings.map((w) => w.level)).toEqual(['watch-and-act'])
+  })
+})

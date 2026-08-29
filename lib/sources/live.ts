@@ -48,10 +48,11 @@ export class LiveSource implements WarningSource {
 
   /** The first emission is a baseline, not a burst of "new warning" events. */
   private describe(warnings: Warning[]) {
-    const changes = this.emitted ? diffWarnings(this.previous, warnings) : []
+    const previous = this.emitted ? this.previous : []
+    const changes = this.emitted ? diffWarnings(previous, warnings) : []
     this.previous = warnings
     this.emitted = true
-    return changes
+    return { changes, previous }
   }
 
   private async fetchOnce(): Promise<WarningFeed> {
@@ -64,12 +65,14 @@ export class LiveSource implements WarningSource {
       const fetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : null
 
       this.lastGood = { warnings, fetchedAt }
+      const described = this.describe(warnings)
       return {
         warnings,
         fetchedAt,
         stale: body.stale,
         freshness: body.stale ? 'stale' : freshnessOf(fetchedAt),
-        changes: this.describe(warnings),
+        changes: described.changes,
+        previous: described.previous,
         failure: body.failure ?? null,
         dropped: body.dropped ?? 0,
         duplicates: body.duplicates ?? 0,
@@ -86,6 +89,7 @@ export class LiveSource implements WarningSource {
         freshness: fetchedAt ? freshnessOf(fetchedAt) : 'unavailable',
         // Nothing changed upstream that we know of: we simply could not look.
         changes: [],
+        previous: warnings,
         failure: 'network',
         dropped: 0,
         duplicates: 0,

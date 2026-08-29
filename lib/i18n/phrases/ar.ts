@@ -158,5 +158,13 @@ export const ar: PhrasePack = {
     paused: 'متوقّف مؤقتاً',
     readingAloud: 'تتم القراءة بصوت مسموع',
     speechNotSupported: 'هذا المتصفّح لا يستطيع قراءة النص بصوت مسموع.',
+    warningUpdatedTitle: 'تم تحديث التحذير',
+    whatChanged: 'ما الذي تغيّر؟',
+    officialWarningUpdated: 'تم تحديث التحذير الرسمي.',
+    changeLevel: 'تغيّر مستوى التحذير من {from} إلى {to}.',
+    changeArea: 'تغيّرت منطقة التحذير على الخريطة.',
+    changeStatus: 'تغيّرت حالة الحريق من {from} إلى {to}.',
+    changeSize: 'تغيّرت مساحة الحريق من {from} إلى {to}.',
+    changeTime: 'تغيّر وقت التحديث الرسمي إلى {time}.',
   },
 }

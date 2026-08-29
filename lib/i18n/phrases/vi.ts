@@ -149,5 +149,13 @@ export const vi: PhrasePack = {
     paused: 'Đã tạm dừng',
     readingAloud: 'Đang đọc to',
     speechNotSupported: 'Trình duyệt này không đọc được văn bản.',
+    warningUpdatedTitle: 'Cảnh báo đã cập nhật',
+    whatChanged: 'Điều gì đã thay đổi?',
+    officialWarningUpdated: 'Cảnh báo chính thức đã được cập nhật.',
+    changeLevel: 'Mức cảnh báo đổi từ {from} sang {to}.',
+    changeArea: 'Vùng cảnh báo trên bản đồ đã thay đổi.',
+    changeStatus: 'Tình trạng đám cháy đổi từ {from} sang {to}.',
+    changeSize: 'Diện tích cháy đổi từ {from} sang {to}.',
+    changeTime: 'Thời gian cập nhật chính thức đổi thành {time}.',
   },
 }

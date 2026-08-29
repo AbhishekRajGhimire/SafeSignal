@@ -108,7 +108,8 @@ export class DemoSource implements WarningSource {
    */
   private currentFeed(): WarningFeed {
     const warnings = this.steps[this.stepIndex]?.warnings ?? []
-    const changes = this.emitted ? diffWarnings(this.previous, warnings) : []
+    const previous = this.emitted ? this.previous : []
+    const changes = this.emitted ? diffWarnings(previous, warnings) : []
     this.previous = warnings
     this.emitted = true
     return {
@@ -117,6 +118,7 @@ export class DemoSource implements WarningSource {
       stale: false,
       freshness: 'fresh',
       changes,
+      previous,
       failure: null,
       dropped: 0,
       duplicates: 0,
