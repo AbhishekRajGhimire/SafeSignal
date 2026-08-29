@@ -10,7 +10,14 @@ import {
 
 export const dynamic = 'force-dynamic'
 
-const TIMEOUT_MS = 10_000
+/**
+ * Measured, not guessed: 676 source characters took 6.2s and 900 took 7.7s,
+ * so the previous 10s ceiling was already marginal and anything longer timed
+ * out entirely. A translation that arrives late costs nothing, because the
+ * official English is on screen the whole time; one that never arrives costs
+ * the reader their comprehension.
+ */
+const TIMEOUT_MS = 25_000
 const MODEL = 'claude-sonnet-5'
 
 /**
