@@ -61,9 +61,11 @@ export async function POST(request: Request) {
     const message = await client.messages.create({
       model: MODEL,
       max_tokens: 4000,
-      // A short translation does not need deep reasoning, and low effort
-      // keeps both latency and cost down.
-      output_config: { effort: 'low' },
+      // Deliberately not 'low'. At low effort this produced a garbled opening
+      // clause in Hindi roughly one run in four. The text is short, so the
+      // cost difference is negligible, and a mangled word in an evacuation
+      // instruction is not an acceptable trade for it.
+      output_config: { effort: 'high' },
       system: SYSTEM_PROMPT,
       messages: [{ role: 'user', content: `Translate into ${languageName}:\n\n${text}` }],
     })
