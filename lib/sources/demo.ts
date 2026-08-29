@@ -1,0 +1,115 @@
+import type { ScenarioStep } from './scenario'
+import type { WarningFeed, WarningSource } from './types'
+
+export interface DemoState {
+  stepIndex: number
+  playing: boolean
+  totalSteps: number
+}
+
+export class DemoSource implements WarningSource {
+  private stepIndex = 0
+  private playing = false
+  private timer: ReturnType<typeof setTimeout> | null = null
+  private readonly feedListeners = new Set<(feed: WarningFeed) => void>()
+  private readonly stateListeners = new Set<(state: DemoState) => void>()
+
+  constructor(private readonly steps: ScenarioStep[]) {}
+
+  get state(): DemoState {
+    return { stepIndex: this.stepIndex, playing: this.playing, totalSteps: this.steps.length }
+  }
+
+  subscribe(onFeed: (feed: WarningFeed) => void): () => void {
+    this.feedListeners.add(onFeed)
+    onFeed(this.currentFeed())
+    return () => {
+      this.feedListeners.delete(onFeed)
+    }
+  }
+
+  onStateChange(onState: (state: DemoState) => void): () => void {
+    this.stateListeners.add(onState)
+    return () => {
+      this.stateListeners.delete(onState)
+    }
+  }
+
+  play(): void {
+    if (this.playing) return
+    this.playing = true
+    this.emitState()
+    this.scheduleNext()
+  }
+
+  pause(): void {
+    this.playing = false
+    this.clearTimer()
+    this.emitState()
+  }
+
+  restart(): void {
+    this.pause()
+    this.stepIndex = 0
+    this.emitFeed()
+    this.emitState()
+  }
+
+  /** Lets a presenter jump straight to the emergency warning. */
+  seek(index: number): void {
+    this.clearTimer()
+    this.stepIndex = Math.max(0, Math.min(index, this.steps.length - 1))
+    this.emitFeed()
+    this.emitState()
+    if (this.playing) this.scheduleNext()
+  }
+
+  dispose(): void {
+    this.clearTimer()
+    this.feedListeners.clear()
+    this.stateListeners.clear()
+  }
+
+  private scheduleNext(): void {
+    this.clearTimer()
+    const next = this.stepIndex + 1
+    if (next >= this.steps.length) {
+      this.playing = false
+      this.emitState()
+      return
+    }
+
+    const delay = this.steps[next].atMs - this.steps[this.stepIndex].atMs
+    this.timer = setTimeout(() => {
+      this.stepIndex = next
+      this.emitFeed()
+      this.emitState()
+      this.scheduleNext()
+    }, Math.max(0, delay))
+  }
+
+  private clearTimer(): void {
+    if (this.timer !== null) {
+      clearTimeout(this.timer)
+      this.timer = null
+    }
+  }
+
+  private currentFeed(): WarningFeed {
+    return {
+      warnings: this.steps[this.stepIndex]?.warnings ?? [],
+      fetchedAt: new Date(),
+      stale: false,
+    }
+  }
+
+  private emitFeed(): void {
+    const feed = this.currentFeed()
+    for (const listener of this.feedListeners) listener(feed)
+  }
+
+  private emitState(): void {
+    const state = this.state
+    for (const listener of this.stateListeners) listener(state)
+  }
+}
