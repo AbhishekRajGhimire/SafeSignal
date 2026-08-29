@@ -37,12 +37,12 @@ const clockFor = (language: LanguageCode) =>
 export default function Home() {
   const { profile, ready } = useProfile()
   const pack = usePack()
-  const { feed, demoMode, setDemoMode } = useWarnings()
+  const { feed, demoMode, setDemoMode, assessLocation } = useWarnings()
 
-  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  const assessment = assess(feed.warnings, assessLocation, feed.freshness)
   const state = screenStateFrom({
     ready,
-    hasLocation: profile.location !== null,
+    hasLocation: assessLocation !== null,
     assessment,
     changes: feed.changes,
     failure: feed.failure,

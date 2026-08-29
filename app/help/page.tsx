@@ -17,12 +17,12 @@ const RFS_FIRES_NEAR_ME = 'https://www.rfs.nsw.gov.au/fire-information/fires-nea
 export default function HelpPage() {
   const { profile, ready } = useProfile()
   const pack = usePack()
-  const { feed, demoMode } = useWarnings()
+  const { feed, demoMode, assessLocation } = useWarnings()
   const [shareResult, setShareResult] = useState<string | null>(null)
 
   if (!ready) return <main><p>...</p></main>
 
-  const assessment = assess(feed.warnings, profile.location, feed.freshness)
+  const assessment = assess(feed.warnings, assessLocation, feed.freshness)
   const top = assessment.all[0] ?? null
 
   const services = rankServices({

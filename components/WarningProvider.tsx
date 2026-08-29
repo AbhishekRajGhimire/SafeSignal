@@ -21,6 +21,15 @@ interface WarningContextValue {
   selectScenario: (id: DemoScenarioId) => void
   /** Back to the default scenario, step 0, paused, real profile restored. */
   resetDemo: () => void
+  /**
+   * The location the app should reason about.
+   *
+   * Normally the person's own. In demo mode with no profile location it is
+   * the same Blue Mountains anchor the scenarios are built around, because a
+   * judge opening ?demo=1 on a cold device has no location and must still
+   * see the emergency rather than "we do not know where you are".
+   */
+  assessLocation: UserProfile['location']
 }
 
 const WarningContext = createContext<WarningContextValue | null>(null)
@@ -52,6 +61,13 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
   const scenarios = useMemo(
     () => buildScenarios({ lat: anchorLat, lon: anchorLon }, anchorLabel),
     [anchorLat, anchorLon, anchorLabel],
+  )
+
+  const assessLocation = useMemo(
+    () =>
+      profile.location ??
+      (demoMode ? { lat: anchorLat, lon: anchorLon, label: anchorLabel } : null),
+    [profile.location, demoMode, anchorLat, anchorLon, anchorLabel],
   )
 
   const scenario = scenarios.find((s) => s.id === scenarioId) ?? scenarios[0]
@@ -117,9 +133,10 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
       scenarioId,
       selectScenario,
       resetDemo,
+      assessLocation,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [feed, demo, demoState, demoMode, scenarios, scenarioId],
+    [feed, demo, demoState, demoMode, scenarios, scenarioId, assessLocation],
   )
 
   return <WarningContext.Provider value={value}>{children}</WarningContext.Provider>
