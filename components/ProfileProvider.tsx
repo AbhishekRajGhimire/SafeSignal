@@ -30,12 +30,17 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     root.dataset.textSize = profile.largeText ? 'large' : 'normal'
   }, [profile.language, profile.largeText, ready])
 
+  // Persisting in an effect rather than inside the state updater: StrictMode
+  // double-invokes updaters, and a side effect does not belong in one. The
+  // `ready` guard stops the first render writing defaults over a real
+  // stored profile before the load above has run.
+  useEffect(() => {
+    if (!ready) return
+    saveProfile(profile)
+  }, [profile, ready])
+
   const update = useCallback((patch: Partial<UserProfile>) => {
-    setProfile((current) => {
-      const next = { ...current, ...patch }
-      saveProfile(next)
-      return next
-    })
+    setProfile((current) => ({ ...current, ...patch }))
   }, [])
 
   const value = useMemo(() => ({ profile, update, ready }), [profile, update, ready])
