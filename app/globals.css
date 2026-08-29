@@ -2,7 +2,8 @@
   --scale: 1;
 
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans",
-    "Noto Sans Devanagari", "Nirmala UI", "Noto Sans CJK SC", sans-serif;
+    "Noto Sans Devanagari", "Nirmala UI", "Noto Sans CJK SC",
+    "Noto Sans Arabic", "Geeza Pro", "Segoe UI Arabic", sans-serif;
 
   --text-sm: calc(0.875rem * var(--scale));
   --text-base: calc(1rem * var(--scale));
@@ -18,9 +19,11 @@
 
   --ink: #14161a;
   --ink-muted: #55606e;
+  --ink-secondary: #454f5c; /* 8.31:1 on paper, 7.61:1 on paper-sunk */
   --paper: #ffffff;
   --paper-sunk: #f3f5f8;
-  --line: #d6dbe2;
+  --line: #8b95a6;      /* 3.02:1 on paper - WCAG 1.4.11 */
+  --line-soft: #d6dbe2; /* decorative only, never a control boundary */
   --focus: #0b5fff;
 
   --level-emergency-warning: #c8102e;
@@ -35,8 +38,10 @@
   --level-not-applicable-ink: #ffffff;
 }
 
-/* Large text scales the ramp and the tap targets together. */
-:root[data-text-size="large"] { --scale: 1.35; }
+/* Text size scales the whole ramp and every tap target together, never the
+   font size alone. `standard` is the :root default of 1. */
+:root[data-text-size="large"]   { --scale: 1.35; }
+:root[data-text-size="x-large"] { --scale: 1.70; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -67,7 +72,7 @@ p { margin: 0 0 var(--space-2); }
 
 .card {
   background: var(--paper);
-  border: 1px solid var(--line);
+  border: 1px solid var(--line-soft);
   border-radius: 12px;
   padding: var(--space-3);
   margin-bottom: var(--space-3);
@@ -122,7 +127,7 @@ p { margin: 0 0 var(--space-2); }
 
 .official {
   background: var(--paper-sunk);
-  border-left: 4px solid var(--ink-muted);
+  border-inline-start: 4px solid var(--ink-muted);
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-sm);
   white-space: pre-wrap;
@@ -163,4 +168,181 @@ p { margin: 0 0 var(--space-2); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ============================================================
+   SETUP — "tell us how to communicate with you"
+   One question per screen. Deliberately not a registration form.
+   ============================================================ */
+
+.setup {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-3);
+  padding-bottom: calc(var(--space-4) * 3);
+}
+
+/* Progress carries a number and a bar. The bar alone would be colour-only. */
+.progress { margin-bottom: var(--space-3); }
+
+.progress__text {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.progress__track {
+  height: calc(6px * var(--scale));
+  background: var(--paper-sunk);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  background: var(--ink);
+  border-radius: 999px;
+  transition: width 240ms ease;
+}
+
+.question { margin-bottom: var(--space-4); }
+.question__help { color: var(--ink-secondary); font-size: var(--text-sm); }
+
+/* The heading receives focus on every step change, so a screen reader and a
+   keyboard user both land on the new question rather than the page top. */
+.question__heading:focus-visible { outline: 3px solid var(--focus); outline-offset: 4px; }
+
+.options { display: block; }
+
+/*
+ * An option is a full-width target. Selection is signalled three ways at once:
+ * a check glyph, a thicker border, and a background change. Never colour alone.
+ */
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: calc(var(--tap-min) + var(--space-3));
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  font: inherit;
+  font-size: var(--text-lg);
+  text-align: start;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.option:hover { background: var(--paper-sunk); }
+
+.option--selected {
+  border-color: var(--focus);
+  border-width: 3px;
+  background: #eef3ff;
+  font-weight: 600;
+}
+
+/* The tick box is a shape, present for every option, filled only when chosen. */
+.option__mark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(28px * var(--scale));
+  height: calc(28px * var(--scale));
+  border: 2px solid var(--line);
+  background: var(--paper);
+  color: var(--paper);
+  font-size: calc(16px * var(--scale));
+  line-height: 1;
+}
+
+/* Round for "choose one", square for "choose any" - the shape states the rule. */
+.option__mark--single { border-radius: 999px; }
+.option__mark--multi  { border-radius: 6px; }
+
+.option--selected .option__mark {
+  background: var(--focus);
+  border-color: var(--focus);
+  color: var(--paper);
+}
+
+.option__label { flex: 1 1 auto; }
+
+.option__note {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--ink-secondary);
+  margin-top: var(--space-1);
+}
+
+/* The real control stays in the accessibility tree and is keyboard-focusable;
+   it is visually replaced by .option__mark rather than removed. */
+.option__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.option__input:focus-visible + .option__mark {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* Text-size preview reads at the size being chosen, not the current one. */
+.preview {
+  padding: var(--space-3);
+  background: var(--paper);
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  margin-bottom: var(--space-3);
+}
+
+.preview__label {
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+  margin-bottom: var(--space-1);
+}
+
+.preview__sample { font-size: var(--text-lg); margin: 0; }
+
+/* Navigation sits at the bottom, always reachable, always in the same place. */
+.setup__nav {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.setup__nav .button { width: auto; flex: 1 1 0; }
+
+.notice {
+  padding: var(--space-3);
+  border: 2px solid var(--level-emergency-warning);
+  border-radius: 12px;
+  background: var(--paper);
+  font-weight: 600;
+  margin-bottom: var(--space-3);
+}
+
+.reassure {
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+  margin-top: var(--space-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress__fill { transition: none; }
 }

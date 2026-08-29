@@ -1,0 +1,137 @@
+import type { PhrasePack } from '../types'
+
+/**
+ * TRANSLATION REVIEW REQUIRED.
+ * Written for the hackathon build and not yet checked by a native speaker or
+ * against official multilingual emergency material. Emergency wording carries
+ * real consequences; treat every string here as provisional until reviewed.
+ *
+ * Arabic is the only right-to-left language in the set. Direction is applied
+ * at the document level from `directionOf()`, not per string.
+ */
+export const ar: PhrasePack = {
+  levelName: {
+    'emergency-warning': 'تحذير طارئ',
+    'watch-and-act': 'انتبه وتصرّف',
+    advice: 'إرشاد',
+    'planned-burn': 'حرق مُخطَّط له',
+    'not-applicable': 'حادثة مُسجَّلة',
+  },
+  levelMeaning: {
+    'emergency-warning': 'أنت في خطر الآن.',
+    'watch-and-act': 'الحريق قريب. استعدّ للمغادرة الآن.',
+    advice: 'هناك حريق مشتعل قريباً. لا يوجد خطر مباشر الآن.',
+    'planned-burn': 'أشعل رجال الإطفاء هذا الحريق عن قصد. قد ترى دخاناً.',
+    'not-applicable': 'هذه حادثة مُسجَّلة، وليست تحذيراً.',
+  },
+  levelAction: {
+    'emergency-warning': 'لا تنتظر. اتبع الإرشادات الرسمية أدناه الآن.',
+    'watch-and-act': 'استعدّ للمغادرة. لا تنتظر تحذيراً آخر.',
+    advice: 'واصل متابعة المستجدات.',
+    'planned-burn': 'لا تحتاج إلى فعل شيء. أغلق النوافذ إذا كان هناك دخان.',
+    'not-applicable': 'لا تحتاج إلى فعل شيء.',
+  },
+  statusValues: {
+    'out of control': 'الحريق غير مُسيطَر عليه.',
+    'not yet controlled': 'لم يسيطر رجال الإطفاء على هذا الحريق بعد.',
+    'being controlled': 'رجال الإطفاء يسيطرون على الحريق.',
+    'under control': 'الحريق تحت السيطرة.',
+  },
+  typeValues: {
+    'bush fire': 'حريق أحراش',
+    'grass fire': 'حريق أعشاب',
+    'structure fire': 'حريق مبنى',
+    'burn off': 'حرق تنظيف',
+    'hazard reduction': 'حرق للحدّ من المخاطر',
+    'planned event': 'فعالية مُخطَّط لها',
+    'haystack fire': 'حريق كومة قش',
+    other: 'أخرى',
+  },
+  fields: {
+    location: 'المكان',
+    council: 'منطقة البلدية',
+    status: 'الحالة',
+    size: 'مساحة الحريق',
+    updated: 'آخر تحديث',
+    agency: 'الجهة المسؤولة',
+  },
+  ui: {
+    yourArea: 'منطقتك',
+    noWarningsTitle: 'لا توجد تحذيرات قريبة منك الآن',
+    noWarningsBody: 'نواصل التحقق من المعلومات الرسمية. إذا تغيّر شيء، سيظهر هنا.',
+    officialWording: 'النص الرسمي (بالإنجليزية)',
+    viewOfficial: 'افتح خريطة الحرائق الرسمية لـ NSW RFS',
+    listen: 'استمع',
+    stopListening: 'إيقاف',
+    audioUnavailable: 'هذا الجهاز لا يستطيع قراءة هذه اللغة بصوت مسموع.',
+    getHelp: 'احصل على المساعدة',
+    callNow: 'اتصل الآن',
+    dataAsOf: 'المعلومات حتى',
+    offlineNotice: 'أنت غير متصل بالإنترنت. هذه آخر معلومات وصلتنا.',
+    demoBanner: 'وضع العرض التوضيحي: هذه بيانات محاكاة، وليست تحذيراً حقيقياً.',
+    kmAway: 'كم',
+    youAreInside: 'أنت داخل منطقة الحريق',
+    changeSettings: 'تغيير الإعدادات',
+    whatToDo: 'ما ينبغي أن تفعله الآن',
+    whatToSay: 'ماذا تقول عند الاتصال',
+    shareSituation: 'أرسل وضعي إلى شخص ما',
+    sourceRfs: 'المصدر: هيئة الإطفاء الريفية في نيو ساوث ويلز',
+
+    setupTitle: 'أخبر SafeSignal كيف نتواصل معك',
+    setupIntro: 'أسئلة قصيرة، لكي تصلك التحذيرات بالطريقة المناسبة لك.',
+    setupReassure: 'تبقى هذه المعلومات على هاتفك. لا يُرسل إلينا شيء. يمكنك تغييرها في أي وقت.',
+    saveAndContinue: 'ابدأ',
+    stepWord: 'الخطوة',
+    ofWord: 'من',
+    back: 'رجوع',
+    next: 'التالي',
+    finish: 'إنهاء',
+    selectedMarker: 'مُختار',
+    selectAllThatApply: 'اختر كل ما ينطبق. يمكنك اختيار أكثر من واحد.',
+
+    qLanguage: 'ما اللغة التي تفضّلها؟',
+    qLanguageHelp: 'ستظهر التحذيرات وتُقرأ بصوت مسموع بهذه اللغة.',
+    languageOther: 'لغة أخرى',
+    languageOtherHelp: 'سنعرض الإنجليزية ونعطيك رقم مترجم فوري مجاني.',
+
+    qTextSize: 'ما حجم الخط المناسب؟',
+    qTextSizeHelp: 'تكبر الأزرار مع الخط، لتبقى سهلة اللمس.',
+    textStandard: 'عادي',
+    textLarge: 'كبير',
+    textXLarge: 'كبير جداً',
+    textPreview: 'الحريق قريب. استعدّ للمغادرة الآن.',
+
+    qAudio: 'هل نقرأ التحذيرات بصوت مسموع؟',
+    qAudioHelp: 'يمكنك الضغط على "استمع" في أي وقت.',
+    audioOn: 'نعم، اقرأها بصوت مسموع',
+    audioOff: 'لا، سأقرأها بنفسي',
+
+    qNeeds: 'هل هناك ما ينبغي أن نعرفه؟',
+    qNeedsHelp: 'هذا يغيّر المساعدة التي نقدّمها لك. ولا يغيّر التحذير نفسه أبداً.',
+    needMobility: 'أحتاج مساعدة في التنقّل',
+    needLowVision: 'لديّ ضعف في البصر',
+    needHearing: 'لديّ صعوبة في السمع',
+    needCognitive: 'لديّ صعوبة في التعلّم أو التذكّر',
+    needSimpler: 'أفضّل معلومات أبسط',
+    needNone: 'لا شيء من هذه',
+
+    qTransport: 'إذا اضطررت للمغادرة، كيف ستنتقل؟',
+    qTransportHelp: 'يساعدنا هذا على عرض الرقم المناسب أولاً.',
+    transportCar: 'لديّ سيارة',
+    transportPublic: 'أستخدم المواصلات العامة',
+    transportTaxi: 'سآخذ سيارة أجرة أو خدمة توصيل',
+    transportAccessible: 'أحتاج وسيلة نقل مُهيّأة لذوي الإعاقة',
+    transportAssistance: 'سأحتاج شخصاً يساعدني',
+    transportUnsure: 'لست متأكداً',
+
+    qLocation: 'أين أنت؟',
+    qLocationHelp: 'نستخدم هذا على هاتفك فقط، للعثور على التحذيرات القريبة منك.',
+    useMyLocation: 'استخدم موقعي الحالي',
+    searchPlace: 'أو اكتب اسم البلدة أو الرمز البريدي',
+    locationRequired: 'يرجى اختيار موقع حتى نتمكّن من العثور على التحذيرات القريبة منك.',
+    locationDenied: 'لم نتمكّن من تحديد موقعك. يرجى كتابة اسم بلدتك أدناه.',
+    locationChosen: 'موقعك',
+    placesFound: 'أماكن مطابقة',
+    noPlacesFound: 'لا توجد أماكن مطابقة. جرّب اسماً أو رمزاً بريدياً آخر.',
+  },
+}

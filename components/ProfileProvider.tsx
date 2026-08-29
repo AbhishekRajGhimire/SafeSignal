@@ -1,8 +1,14 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { DEFAULT_PROFILE, loadProfile, saveProfile, type UserProfile } from '@/lib/domain/profile'
-import { getPack, SPEECH_LOCALE, type PhrasePack } from '@/lib/i18n'
+import {
+  DEFAULT_PROFILE,
+  directionOf,
+  loadProfile,
+  saveProfile,
+  type UserProfile,
+} from '@/lib/domain/profile'
+import { getPack, speechLocaleOf, type PhrasePack } from '@/lib/i18n'
 
 interface ProfileContextValue {
   profile: UserProfile
@@ -26,9 +32,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!ready) return
     const root = document.documentElement
-    root.lang = SPEECH_LOCALE[profile.language]
-    root.dataset.textSize = profile.largeText ? 'large' : 'normal'
-  }, [profile.language, profile.largeText, ready])
+    root.lang = speechLocaleOf(profile.language)
+    // Arabic is right-to-left. Everything else in the set is left-to-right.
+    root.dir = directionOf(profile.language)
+    root.dataset.textSize = profile.textSize
+  }, [profile.language, profile.textSize, ready])
 
   // Persisting in an effect rather than inside the state updater: StrictMode
   // double-invokes updaters, and a side effect does not belong in one. The

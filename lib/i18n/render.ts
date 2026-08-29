@@ -1,6 +1,6 @@
 import type { RelevantWarning } from '@/lib/domain/match'
 import type { LanguageCode } from '@/lib/domain/profile'
-import { getPack, SPEECH_LOCALE } from './index'
+import { getPack, speechLocaleOf } from './index'
 
 export interface RenderedWarning {
   /** The official label, which may be unfamiliar. */
@@ -92,6 +92,6 @@ export function renderWarning(
     speechText: [levelMeaning, w.location, statusText, levelAction]
       .filter(Boolean)
       .join(' '),
-    speechLocale: SPEECH_LOCALE[language],
+    speechLocale: speechLocaleOf(language),
   }
 }

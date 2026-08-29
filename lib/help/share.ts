@@ -1,4 +1,4 @@
-import type { UserProfile } from '@/lib/domain/profile'
+import { hasNeed, type UserProfile } from '@/lib/domain/profile'
 import type { RelevantWarning } from '@/lib/domain/match'
 
 const LEVEL_LABEL: Record<string, string> = {
@@ -9,10 +9,19 @@ const LEVEL_LABEL: Record<string, string> = {
   'not-applicable': 'incident',
 }
 
-const MOBILITY_LINE: Record<string, string> = {
-  'limited-walking': 'I have difficulty walking.',
-  wheelchair: 'I use a wheelchair.',
-  bedbound: 'I am in bed and cannot move without help.',
+/** Only the facts a neighbour needs in order to help. Nothing more. */
+const NEED_LINE: Partial<Record<string, string>> = {
+  mobility: 'I need help to move around.',
+  'low-vision': 'I have low vision.',
+  hearing: 'I have difficulty hearing.',
+}
+
+const TRANSPORT_LINE: Partial<Record<UserProfile['transport'], string>> = {
+  'public-transport': 'I do not have a car.',
+  'taxi-rideshare': 'I do not have a car.',
+  'accessible-transport': 'I need accessible transport.',
+  'needs-assistance': 'I need someone to help me leave.',
+  unsure: 'I am not sure how I would leave.',
 }
 
 /**
@@ -36,9 +45,13 @@ export function buildShareMessage(
     }
   }
 
-  const mobility = MOBILITY_LINE[profile.mobility]
-  if (mobility) lines.push(mobility)
-  if (profile.transport === 'no-transport') lines.push('I have no transport.')
+  for (const need of ['mobility', 'low-vision', 'hearing'] as const) {
+    const line = hasNeed(profile, need) ? NEED_LINE[need] : undefined
+    if (line) lines.push(line)
+  }
+
+  const transport = TRANSPORT_LINE[profile.transport]
+  if (transport) lines.push(transport)
 
   lines.push('Sent from SafeSignal.')
   return lines.join('\n')
