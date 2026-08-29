@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { revealEmergency } from '@/lib/motion/reveal'
 import { OfficialBlock } from './OfficialBlock'
+import { ProximityDiagram } from './ProximityDiagram'
 import { SpeechControls } from '../speech/SpeechControls'
 import { usePack, useProfile } from '../ProfileProvider'
 import { renderWarning } from '@/lib/i18n/render'
@@ -56,6 +57,9 @@ export function EmergencyWarning({ relevant }: { relevant: RelevantWarning }) {
         </p>
 
         <p className="emergency__status">{view.statusText}</p>
+
+        {/* The same relationship as the sentence above, drawn. */}
+        <ProximityDiagram relevant={relevant} />
 
         {/* 3. What must I do. Given its own weight, not a fourth paragraph. */}
         <div className="emergency__action">

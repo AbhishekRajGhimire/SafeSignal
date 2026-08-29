@@ -70,7 +70,7 @@ export const ar: PhrasePack = {
     offlineNotice: 'أنت غير متصل بالإنترنت. هذه آخر معلومات وصلتنا.',
     demoBanner: 'وضع العرض التوضيحي: هذه بيانات محاكاة، وليست تحذيراً حقيقياً.',
     kmAway: 'كم',
-    youAreInside: 'أنت داخل منطقة الحريق',
+    youAreInside: 'أنت داخل منطقة الحريق.',
     changeSettings: 'تغيير الإعدادات',
     whatToDo: 'ما ينبغي أن تفعله الآن',
     whatToSay: 'ماذا تقول عند الاتصال',

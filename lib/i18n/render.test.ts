@@ -62,7 +62,7 @@ describe('renderWarning', () => {
 
   it('says the user is inside rather than giving a distance', () => {
     const inside = { ...relevant, inside: true, band: 'inside' as const }
-    expect(renderWarning(inside, 'en').distanceText).toBe('You are inside the fire area')
+    expect(renderWarning(inside, 'en').distanceText).toBe('You are inside the fire area.')
   })
 
   it('gives no distance text when the location is unknown', () => {

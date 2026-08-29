@@ -66,7 +66,7 @@ export const vi: PhrasePack = {
     switchToLive: 'Chế độ trực tiếp',
     switchToDemo: 'Chế độ minh họa',
     kmAway: 'km',
-    youAreInside: 'Bạn đang ở trong khu vực đám cháy',
+    youAreInside: 'Bạn đang ở trong khu vực đám cháy.',
     changeSettings: 'Thay đổi cài đặt',
     whatToDo: 'Bạn nên làm gì bây giờ',
     whatToSay: 'Nói gì khi bạn gọi điện',

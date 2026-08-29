@@ -66,7 +66,7 @@ export const hi: PhrasePack = {
     switchToLive: 'लाइव मोड',
     switchToDemo: 'डेमो मोड',
     kmAway: 'किलोमीटर दूर',
-    youAreInside: 'आप आग के क्षेत्र के अंदर हैं',
+    youAreInside: 'आप आग के क्षेत्र के अंदर हैं।',
     changeSettings: 'सेटिंग बदलें',
     whatToDo: 'आपको अभी क्या करना चाहिए',
     whatToSay: 'कॉल करते समय क्या कहें',

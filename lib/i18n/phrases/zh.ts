@@ -66,7 +66,7 @@ export const zh: PhrasePack = {
     switchToLive: '实时模式',
     switchToDemo: '演示模式',
     kmAway: '公里外',
-    youAreInside: '您位于火灾影响范围内',
+    youAreInside: '您位于火灾影响范围内。',
     changeSettings: '修改设置',
     whatToDo: '您现在应该做什么',
     whatToSay: '打电话时该怎么说',

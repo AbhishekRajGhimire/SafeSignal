@@ -254,3 +254,46 @@ describe('motion never gates emergency information', () => {
     expect(motion).toContain("clearProps: 'all'")
   })
 })
+
+describe('the proximity diagram is a schematic, never a map', () => {
+  const diagram = readFileSync('components/warning/ProximityDiagram.tsx', 'utf8')
+
+  it('draws only facts the official feed provides', () => {
+    // Containment and distance. Nothing else is available, and anything
+    // else drawn would be invented.
+    expect(diagram).toContain("relevant.verdict === 'affected'")
+    expect(diagram).toContain('relevant.distanceKm')
+  })
+
+  it('has no direction, bearing or heading in its code', () => {
+    // A direction would imply where the fire is going, which the feed does
+    // not say, and would read as an evacuation route. Comments are stripped
+    // first: the file explains at length that it has no directions, and
+    // matching that prose would be matching the wrong thing.
+    const code = diagram
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+    expect(code).not.toMatch(/\b(bearing|heading|northOf|southOf|compass)\b/i)
+  })
+
+  it('draws nothing when there is neither containment nor a distance', () => {
+    expect(diagram).toContain('if (!drawable) return null')
+  })
+
+  it('is hidden from assistive technology, because the text already says it', () => {
+    expect(diagram).toContain('aria-hidden="true"')
+  })
+
+  it('always carries a text caption, so it is never the only place a fact appears', () => {
+    expect(diagram).toContain('figcaption')
+    expect(diagram).toContain('pack.ui.youAreInside')
+  })
+
+  it('collapses to a flat plan when motion is unwelcome', () => {
+    const css = readFileSync('app/globals.css', 'utf8')
+    const reduced = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'))
+    expect(reduced).toContain('.pd__stage')
+    expect(reduced).toContain('perspective: none')
+  })
+})

@@ -16,7 +16,7 @@ export const en: PhrasePack = {
     'not-applicable': 'This is a recorded incident, not a warning.',
   },
   levelAction: {
-    'emergency-warning': 'Do not wait. Follow the official advice below now.',
+    'emergency-warning': 'Do not wait. Follow the official advice below.',
     'watch-and-act': 'Get ready to leave. Do not wait for another warning.',
     advice: 'Keep checking for updates.',
     'planned-burn': 'You do not need to do anything. Close your windows if there is smoke.',
@@ -66,7 +66,7 @@ export const en: PhrasePack = {
     switchToLive: 'Live mode',
     switchToDemo: 'Demo mode',
     kmAway: 'km away',
-    youAreInside: 'You are inside the fire area',
+    youAreInside: 'You are inside the fire area.',
     changeSettings: 'Change settings',
     whatToDo: 'What you should do now',
     whatToSay: 'What to say when you call',

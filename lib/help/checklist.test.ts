@@ -18,7 +18,7 @@ describe('buildChecklist', () => {
   it('leads with the plain-language action, marked as SafeSignal wording', () => {
     const items = buildChecklist(warning(null), 'en')
     expect(items[0].source).toBe('safesignal')
-    expect(items[0].text).toBe('Do not wait. Follow the official advice below now.')
+    expect(items[0].text).toBe('Do not wait. Follow the official advice below.')
   })
 
   it('splits the official advice into one step per sentence, tagged to the RFS', () => {

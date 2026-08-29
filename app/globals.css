@@ -678,8 +678,10 @@ p { margin: 0 0 var(--space-2); }
 
 .emergency__place {
   font-size: var(--text-lg);
-  line-height: 1.35;
-  margin: 0 0 var(--space-2);
+  line-height: 1.3;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 var(--space-3);
 }
 
 /* "You are inside the fire area" is the most important sentence after the
@@ -687,24 +689,26 @@ p { margin: 0 0 var(--space-2); }
    survives both themes and colour blindness. */
 .emergency__here {
   display: block;
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
   padding-inline-start: var(--space-3);
-  border-inline-start: 4px solid var(--accent-level);
+  border-inline-start: 3px solid var(--accent-level);
   font-weight: 700;
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
+  line-height: 1.3;
+  color: var(--text);
 }
 
 .emergency__status {
   color: var(--text-2);
   font-size: var(--text-base);
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--space-5);
 }
 
 /* What to do is its own block, not a fourth paragraph of equal weight. */
 .emergency__action {
-  border-inline-start: 4px solid var(--accent-level);
+  border-inline-start: 3px solid var(--accent-level);
   padding-inline-start: var(--space-3);
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--space-5);
 }
 
 .emergency__action-label {
@@ -765,41 +769,28 @@ p { margin: 0 0 var(--space-2); }
    Explanation   sans, paper, dashed rule, the reader's own language
    ------------------------------------------------------------------ */
 
-.message { margin: var(--space-4) 0 0; }
+.message { margin: 0; }
+.message__part + .message__part { margin-top: 1px; }
 
 .message__part { padding: var(--space-3); }
 
 .message__part--official {
-  background: var(--paper-sunk);
-  border: 1px solid var(--line);
-  border-left: 4px solid var(--ink-muted);
-  border-radius: 8px 8px 0 0;
+  background: var(--surface-sunk);
+  border: 0;
+  border-inline-start: 3px solid var(--text-2);
+  border-radius: 0;
 }
 
 .message__part--explanation {
-  background: var(--paper);
-  border: 1px dashed var(--line);
-  border-top: 0;
-  border-left: 4px dashed var(--focus);
+  background: var(--surface);
+  border: 0;
+  border-inline-start: 3px dashed var(--accent);
 }
 
 .message__part--source {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-top: 0;
-  border-left: 4px solid var(--line);
-  border-radius: 0 0 8px 8px;
-}
-
-[dir='rtl'] .message__part--official,
-[dir='rtl'] .message__part--source {
-  border-left: 1px solid var(--line);
-  border-right: 4px solid var(--ink-muted);
-}
-
-[dir='rtl'] .message__part--explanation {
-  border-left: 1px dashed var(--line);
-  border-right: 4px dashed var(--focus);
+  background: var(--surface);
+  border: 0;
+  border-inline-start: 3px solid var(--border-soft);
 }
 
 .message__label {
@@ -999,7 +990,7 @@ p { margin: 0 0 var(--space-2); }
    time, and nothing here ever replaces or hides it.
    ============================================================ */
 
-.speech { margin: var(--space-3) 0; }
+.speech { margin: 0 0 var(--space-5); }
 
 .speech__controls {
   display: flex;
@@ -1579,3 +1570,121 @@ p { margin: 0 0 var(--space-2); }
    bidi isolation; this aligns the block so an isolated English sentence
    does not sit ragged against the wrong margin. */
 .ltr { display: block; text-align: left; }
+
+
+/* ==================================================================
+   PROXIMITY DIAGRAM
+
+   One relationship, drawn: you, and the fire area. Tilted onto a ground
+   plane so "inside" lands as a feeling rather than as a sentence.
+
+   Depth comes from three things and no library: a shallow perspective
+   tilt, a pin that stands off the plane, and the shadow that pin casts
+   onto it. The shadow is what makes the tilt read as ground.
+   ================================================================== */
+
+.pd {
+  margin: 0 0 var(--space-5);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  /* Its own band, so it cannot collide with the sentence above it. */
+  padding-block: var(--space-4);
+}
+
+.pd__stage {
+  position: relative;
+  width: min(250px, 70vw);
+  aspect-ratio: 1;
+  /* Centred origin, so the middle of the plane stays the middle of the box
+     and the pin can stand exactly on it. Shifting it moved the plane out
+     from under the pin. */
+  perspective: 760px;
+  perspective-origin: 50% 50%;
+  /* The tilt leaves unused height above and below. Pulling the box in is
+     honest; overflowing the SVG upward ran it into the text above. */
+  margin-block: calc(var(--space-4) * -1);
+}
+
+.pd__svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  /* Shallow enough to stay readable as a plan, steep enough to read as a
+     floor. Past about 50deg it collapses into a thin ellipse. */
+  transform: rotateX(46deg);
+  transform-style: preserve-3d;
+}
+
+.pd__ring {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 1.25;
+  opacity: 0.55;
+}
+
+.pd__area {
+  fill: var(--accent-level, var(--level-emergency-warning));
+  opacity: 0.3;
+  stroke: var(--accent-level, var(--level-emergency-warning));
+  stroke-width: 2;
+  stroke-opacity: 0.85;
+}
+
+/* Lies flat on the plane, directly beneath the pin. */
+.pd__shadow {
+  fill: var(--text);
+  opacity: 0.16;
+}
+
+/* The pin is a sibling of the plane, not a child of it: it stays upright
+   in screen space while the ground tilts away beneath it. */
+.pd__pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translate(-50%, -100%);
+  pointer-events: none;
+}
+
+.pd__head {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 3px var(--surface);
+  order: -1;
+}
+
+.pd__stem {
+  width: 2px;
+  height: 32px;
+  background: linear-gradient(to bottom, var(--text) 30%, transparent);
+}
+
+.pd__caption {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-2);
+  text-align: center;
+}
+
+.pd--inside .pd__caption { color: var(--text); }
+
+/* Flat, still and fully legible when motion is unwelcome. The diagram
+   keeps communicating; it simply stops being dimensional. */
+@media (prefers-reduced-motion: reduce) {
+  .pd__stage { perspective: none; margin-block: 0; }
+  .pd__svg { transform: none; }
+  .pd__pin { transform: translate(-50%, -50%); }
+  .pd__stem, .pd__shadow { display: none; }
+}
+
+/* Landscape on a phone: vertical space is scarce and the diagram is the
+   first thing that can go. */
+@media (max-height: 30rem) and (orientation: landscape) {
+  .pd { display: none; }
+}
