@@ -89,6 +89,25 @@ describe('buildCallScript', () => {
     expect(script.translated.join(' ')).toContain('Katoomba')
   })
 
+  it('translates the language name and alert level inside the translated column', () => {
+    // The translated column exists so the caller understands what they are
+    // saying. Leaving "Mandarin" and "Emergency Warning" in English there
+    // defeats the point of showing it at all.
+    const script = buildCallScript(profile({ language: 'zh' }), warning, 'evacuate')
+    const translated = script.translated.join(' ')
+    expect(translated).not.toContain('Mandarin')
+    expect(translated).not.toContain('Emergency Warning')
+    expect(translated).toContain('中文')
+    expect(translated).toContain('紧急警报')
+  })
+
+  it('keeps the English column in English so the operator understands it', () => {
+    const script = buildCallScript(profile({ language: 'vi' }), warning, 'evacuate')
+    const english = script.english.join(' ')
+    expect(english).toContain('Vietnamese')
+    expect(english).toContain('Emergency Warning')
+  })
+
   it('omits mobility and transport sentences when neither is a barrier', () => {
     const script = buildCallScript(
       profile({ mobility: 'none', transport: 'own-car' }),

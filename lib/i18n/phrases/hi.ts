@@ -69,6 +69,7 @@ export const hi: PhrasePack = {
     saveAndContinue: 'सहेजें और आगे बढ़ें',
     changeSettings: 'सेटिंग बदलें',
     whatToDo: 'आपको अभी क्या करना चाहिए',
+    whatToSay: 'कॉल करते समय क्या कहें',
     shareSituation: 'मेरी स्थिति किसी को भेजें',
     sourceRfs: 'स्रोत: NSW ग्रामीण अग्निशमन सेवा',
     mobilityNone: 'मैं खुद चल सकता/सकती हूँ',

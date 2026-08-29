@@ -29,6 +29,7 @@ export const UI_KEYS = [
   'saveAndContinue',
   'changeSettings',
   'whatToDo',
+  'whatToSay',
   'shareSituation',
   'sourceRfs',
   'mobilityNone',

@@ -69,6 +69,7 @@ export const zh: PhrasePack = {
     saveAndContinue: '保存并继续',
     changeSettings: '修改设置',
     whatToDo: '您现在应该做什么',
+    whatToSay: '打电话时该怎么说',
     shareSituation: '把我的情况发给别人',
     sourceRfs: '来源：新南威尔士州乡村消防局',
     mobilityNone: '我可以自己走动',

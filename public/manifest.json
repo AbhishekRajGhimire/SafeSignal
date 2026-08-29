@@ -1,0 +1,12 @@
+{
+  "name": "SafeSignal",
+  "short_name": "SafeSignal",
+  "description": "Official NSW bushfire warnings, made understandable.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#c8102e",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

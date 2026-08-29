@@ -69,6 +69,7 @@ export const vi: PhrasePack = {
     saveAndContinue: 'Lưu và tiếp tục',
     changeSettings: 'Thay đổi cài đặt',
     whatToDo: 'Bạn nên làm gì bây giờ',
+    whatToSay: 'Nói gì khi bạn gọi điện',
     shareSituation: 'Gửi tình trạng của tôi cho người khác',
     sourceRfs: 'Nguồn: Sở Cứu hỏa Nông thôn NSW',
     mobilityNone: 'Tôi tự đi lại được',

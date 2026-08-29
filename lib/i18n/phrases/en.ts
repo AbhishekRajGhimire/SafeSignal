@@ -69,6 +69,7 @@ export const en: PhrasePack = {
     saveAndContinue: 'Save and continue',
     changeSettings: 'Change settings',
     whatToDo: 'What you should do now',
+    whatToSay: 'What to say when you call',
     shareSituation: 'Send my situation to someone',
     sourceRfs: 'Source: NSW Rural Fire Service',
     mobilityNone: 'I can walk on my own',

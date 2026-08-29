@@ -1,7 +1,166 @@
+:root {
+  --scale: 1;
+
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans",
+    "Noto Sans Devanagari", "Nirmala UI", "Noto Sans CJK SC", sans-serif;
+
+  --text-sm: calc(0.875rem * var(--scale));
+  --text-base: calc(1rem * var(--scale));
+  --text-lg: calc(1.25rem * var(--scale));
+  --text-xl: calc(1.625rem * var(--scale));
+  --text-2xl: calc(2.125rem * var(--scale));
+
+  --tap-min: calc(44px * var(--scale));
+  --space-1: calc(4px * var(--scale));
+  --space-2: calc(8px * var(--scale));
+  --space-3: calc(16px * var(--scale));
+  --space-4: calc(24px * var(--scale));
+
+  --ink: #14161a;
+  --ink-muted: #55606e;
+  --paper: #ffffff;
+  --paper-sunk: #f3f5f8;
+  --line: #d6dbe2;
+  --focus: #0b5fff;
+
+  --level-emergency-warning: #c8102e;
+  --level-emergency-warning-ink: #ffffff;
+  --level-watch-and-act: #e35205;
+  --level-watch-and-act-ink: #ffffff;
+  --level-advice: #ffc72c;
+  --level-advice-ink: #14161a;
+  --level-planned-burn: #0072ce;
+  --level-planned-burn-ink: #ffffff;
+  --level-not-applicable: #55606e;
+  --level-not-applicable-ink: #ffffff;
+}
+
+/* Large text scales the ramp and the tap targets together. */
+:root[data-text-size="large"] { --scale: 1.35; }
+
 *, *::before, *::after { box-sizing: border-box; }
+
 html, body { margin: 0; padding: 0; }
+
 body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background: #ffffff;
-  color: #111318;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--paper-sunk);
+  -webkit-text-size-adjust: 100%;
+}
+
+main {
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-3);
+  padding-bottom: calc(var(--space-4) * 2);
+}
+
+h1 { font-size: var(--text-2xl); line-height: 1.2; margin: 0 0 var(--space-2); }
+h2 { font-size: var(--text-xl); line-height: 1.25; margin: 0 0 var(--space-2); }
+h3 { font-size: var(--text-lg); margin: 0 0 var(--space-1); }
+p { margin: 0 0 var(--space-2); }
+
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: var(--space-2) var(--space-3);
+  font: inherit;
+  font-weight: 600;
+  color: var(--paper);
+  background: var(--ink);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+}
+
+.button--secondary { background: var(--paper); color: var(--ink); border-color: var(--line); }
+.button--danger { background: var(--level-emergency-warning); }
+
+.stack > * + * { margin-top: var(--space-2); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+/* Shape carries the level too, so colour is never the only signal. */
+.badge__shape { font-size: 1.1em; line-height: 1; }
+
+.banner {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
+.banner--demo { background: #4a2a80; color: #ffffff; }
+.banner--offline { background: #55606e; color: #ffffff; }
+
+.official {
+  background: var(--paper-sunk);
+  border-left: 4px solid var(--ink-muted);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+}
+
+.muted { color: var(--ink-muted); font-size: var(--text-sm); }
+
+.field { display: block; margin-bottom: var(--space-3); }
+.field > span { display: block; font-weight: 600; margin-bottom: var(--space-1); }
+
+.control {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2);
+  font: inherit;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap-min);
+  padding: var(--space-2);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  margin-bottom: var(--space-2);
+  cursor: pointer;
+  font: inherit;
+  color: var(--ink);
+}
+
+.choice--selected { border-color: var(--focus); background: #eef3ff; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
 }

@@ -1,5 +1,6 @@
 import type { Warning } from '@/lib/domain/warning'
 import type { LanguageCode, UserProfile } from '@/lib/domain/profile'
+import { getPack, LANGUAGE_NAMES } from '@/lib/i18n'
 
 export type HelpNeed = 'evacuate' | 'information' | 'check-on-me'
 
@@ -125,14 +126,27 @@ export function buildCallScript(
   if (profile.transport === 'no-transport') keys.push('transportNone')
   if (profile.transport === 'can-get-lift') keys.push('transportLift')
 
-  const values = {
-    place: profile.location?.label ?? '',
+  const place = profile.location?.label ?? ''
+
+  // The English column is what the operator hears, so it stays in English.
+  const englishValues = {
+    place,
     level: warning ? (LEVEL_LABEL[warning.level] ?? warning.level) : '',
     language: LANGUAGE_IN_ENGLISH[profile.language],
   }
 
+  // The translated column exists so the caller understands what they are
+  // saying. Leaving "Mandarin" and "Emergency Warning" in English there
+  // defeats the entire point of showing it.
+  const pack = getPack(profile.language)
+  const translatedValues = {
+    place,
+    level: warning ? pack.levelName[warning.level] : '',
+    language: LANGUAGE_NAMES[profile.language],
+  }
+
   return {
-    english: keys.map((key) => fill(LINES.en[key], values)),
-    translated: keys.map((key) => fill(LINES[profile.language][key], values)),
+    english: keys.map((key) => fill(LINES.en[key], englishValues)),
+    translated: keys.map((key) => fill(LINES[profile.language][key], translatedValues)),
   }
 }
