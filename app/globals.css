@@ -2,23 +2,28 @@
   /* ==========================================================
      SafeSignal design tokens
 
-     Palette: approved Combination C, Cosmic #23212C / Vanilla #F1FEC8.
+     Palette: approved Combination G, Lavender #D2C3F6 / Violet #36255C.
 
-     Vanilla sits 30deg from the Advice hue, which rules it out as a small
-     accent: a vanilla dot beside a warning could be read as an alert. As a
-     large ground it cannot be, and the measurement that matters bears this
-     out. An Advice band scores 1.47:1 against Vanilla and 1.50:1 against
-     the near-white it replaces, so the palette costs nothing: that band
-     never relied on band-against-page contrast, it relies on dark ink, a
-     distinct shape and a word.
+     Lavender cannot be the page ground. Measured, an alert band on it
+     scores: Emergency 3.61:1, Watch and Act 2.35:1, Advice 1.05:1. Watch
+     and Act falls below the 3:1 needed to be distinguishable from the page
+     it sits on, so the ground stays near-white and Lavender is a surface
+     tint and a selected state instead.
+
+     Violet carries the identity: ink, accent, focus, and the dark-mode
+     ground. It sits 51deg from the nearest official hue.
+
+     A dark-first system was measured and rejected. Emergency red scores
+     2.26:1 on Violet, 2.87:1 on Jet Black and 2.69:1 on Cosmic, against
+     5.65:1 on near-white. The Emergency Warning colour only separates
+     properly from a light ground, so the app is light-first by constraint
+     rather than by taste.
 
      So the rule the whole system hangs on:
 
-       Chrome is Cosmic and Vanilla. Signal is the official RFS colour.
-       Vanilla is only ever a ground or a large surface, never a dot, a
-       badge or a rule, because those are the roles an alert colour takes.
-       The emergency screen carries exactly one chromatic colour, and it
-       belongs to the RFS rather than to us.
+       Chrome is Violet. Signal is the official RFS colour. They never
+       appear in the same role, and the emergency screen carries exactly
+       one chromatic colour, which belongs to the RFS and not to us.
 
      60 / 30 / 10 is held as: ground and surfaces 60, ink and structure
      30, violet accent 10 - and on a warning screen the accent budget is
@@ -60,20 +65,18 @@
   --radius: 14px;
   --radius-sm: 10px;
 
-  /* ---- Semantic tokens: light ----
-     The ground is Vanilla itself: warm, paper-like, and the 60% of the
-     60/30/10. Surfaces lift off it rather than sitting flush. */
-  --bg:            #f1fec8;   /* Vanilla, unaltered */
-  --surface:       #fcfdf9;
-  --surface-sunk:  #f0f6dc;
-  --text:          #1c1a23;   /* 16.83:1 on surface */
-  --text-2:        #4f4b63;   /*  8.16:1 */
-  --border:        #88849a;   /*  3.54:1, clears 1.4.11 */
-  --border-soft:   #c9c7d1;   /* decorative only, never a control edge */
-  --accent:        #23212c;   /* Cosmic, 15.51:1 */
-  --accent-surface:#eff9d2;
-  --focus:         #322277;   /* 12.61:1 */
-  --shadow: 0 1px 2px rgba(35, 33, 44, 0.07), 0 8px 24px -12px rgba(35, 33, 44, 0.22);
+  /* ---- Semantic tokens: light ---- */
+  --bg:            #fbfafc;
+  --surface:       #ffffff;
+  --surface-sunk:  #f5f3f9;
+  --text:          #1c132f;   /* 17.74:1 on surface */
+  --text-2:        #49327c;   /* 10.34:1 */
+  --border:        #83779c;   /*  4.13:1, clears 1.4.11 */
+  --border-soft:   #ddd8e9;   /* decorative only, never a control edge */
+  --accent:        #36255c;   /* Violet, 13.32:1 */
+  --accent-surface:#ebe4fb;   /* Lavender, as a tint rather than a ground */
+  --focus:         #4e20b6;   /*  9.52:1 */
+  --shadow: 0 1px 2px rgba(28, 19, 47, 0.06), 0 8px 24px -12px rgba(28, 19, 47, 0.18);
 
   /* ---- Signal. Official NSW RFS colours. Never restyled. ---- */
   --level-emergency-warning: #c8102e;
@@ -103,36 +106,36 @@
    unchanged because their meaning is not ours to adjust. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:            #111016;
-    --surface:       #1f1e27;
-    --surface-sunk:  #0a0a0d;
-    --text:          #f6f9eb;   /* 15.45:1 on surface */
-    --text-2:        #c7d1a9;   /* 10.31:1 */
-    --border:        #6e6a81;   /*  3.17:1 */
-    --border-soft:   #3e3c49;
-    --accent:        #f1fec8;   /* Vanilla, 15.51:1 */
-    --accent-surface:#333040;
-    --focus:         #f1fec8;
+    --bg:            #120c1f;
+    --surface:       #1f1535;
+    --surface-sunk:  #0c0814;
+    --text:          #f3f1f9;   /* 15.42:1 on surface */
+    --text-2:        #b9acd7;   /*  8.17:1 */
+    --border:        #705f95;   /*  3.09:1 */
+    --border-soft:   #3d3451;
+    --accent:        #d2c3f6;   /* Lavender, 10.58:1 */
+    --accent-surface:#2f2050;
+    --focus:         #d2c3f6;
     --shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 8px 24px -12px rgba(0, 0, 0, 0.75);
-    --level-not-applicable: #8f8b9e;
-    --level-not-applicable-ink: #111016;
+    --level-not-applicable: #9083af;
+    --level-not-applicable-ink: #120c1f;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg:            #111016;
-  --surface:       #1f1e27;
-  --surface-sunk:  #0a0a0d;
-  --text:          #f6f9eb;
-  --text-2:        #c7d1a9;
-  --border:        #6e6a81;
-  --border-soft:   #3e3c49;
-  --accent:        #f1fec8;
-  --accent-surface:#333040;
-  --focus:         #f1fec8;
+  --bg:            #120c1f;
+  --surface:       #1f1535;
+  --surface-sunk:  #0c0814;
+  --text:          #f3f1f9;
+  --text-2:        #b9acd7;
+  --border:        #705f95;
+  --border-soft:   #3d3451;
+  --accent:        #d2c3f6;
+  --accent-surface:#2f2050;
+  --focus:         #d2c3f6;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 8px 24px -12px rgba(0, 0, 0, 0.75);
-  --level-not-applicable: #8f8b9e;
-  --level-not-applicable-ink: #111016;
+  --level-not-applicable: #9083af;
+  --level-not-applicable-ink: #120c1f;
 }
 
 /* Text size scales the whole ramp and every tap target together. */
@@ -623,7 +626,7 @@ p { margin: 0 0 var(--space-2); }
   --accent-level-ink: var(--level-advice-ink);
   margin-inline: calc(var(--space-3) * -1);
   margin-bottom: var(--space-4);
-  background: var(--bg);
+  background: var(--surface);
 }
 
 .emergency--emergency-warning {
@@ -743,7 +746,7 @@ p { margin: 0 0 var(--space-2); }
   padding: var(--space-3);
   padding-inline: max(var(--space-3), env(safe-area-inset-left));
   padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
-  background: var(--bg);
+  background: var(--surface);
   border-top: 1px solid var(--border-soft);
 }
 
@@ -780,7 +783,7 @@ p { margin: 0 0 var(--space-2); }
 .message__part { padding: var(--space-3); }
 
 .message__part--official {
-  background: var(--surface);
+  background: var(--surface-sunk);
   border: 0;
   border-inline-start: 3px solid var(--text-2);
   border-radius: 0;
@@ -1636,12 +1639,15 @@ p { margin: 0 0 var(--space-2); }
   opacity: 0.55;
 }
 
+/* The published polygon. Soft fill, defined edge: the boundary is the
+   RFS's, so it is drawn as they gave it rather than blurred away. */
 .pd__area {
   fill: var(--accent-level, var(--level-emergency-warning));
-  opacity: 0.3;
+  fill-opacity: 0.26;
   stroke: var(--accent-level, var(--level-emergency-warning));
   stroke-width: 2;
-  stroke-opacity: 0.85;
+  stroke-opacity: 0.9;
+  stroke-linejoin: round;
 }
 
 /* Lies flat on the plane, directly beneath the pin. */
@@ -1654,6 +1660,8 @@ p { margin: 0 0 var(--space-2); }
    in screen space while the ground tilts away beneath it. */
 .pd__pin {
   position: absolute;
+  /* Overridden inline from the projected position when the warning
+     publishes geometry. Falls back to the centre when it does not. */
   left: 50%;
   top: 50%;
   display: flex;
@@ -1690,6 +1698,18 @@ p { margin: 0 0 var(--space-2); }
   font-weight: 600;
   color: var(--text-2);
   text-align: center;
+  display: grid;
+  gap: var(--space-1);
+}
+
+/* The sentence that stops the diagram becoming a promise. */
+.pd__disclaimer {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--text-2);
+  max-width: 34ch;
+  margin-inline: auto;
+  text-wrap: balance;
 }
 
 .pd--inside .pd__stage:active { cursor: grabbing; }

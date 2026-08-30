@@ -1,43 +1,63 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { usePack } from '../ProfileProvider'
+import { usePack, useProfile } from '../ProfileProvider'
 import { prefersReducedMotion } from '@/lib/motion/reveal'
+import { boundsOf, padBounds, projector, ringToPath } from '@/lib/domain/projection'
+import { usablePolygons } from '@/lib/domain/geo'
 import type { RelevantWarning } from '@/lib/domain/match'
 
+const VIEW = 200
+
 /**
- * Where you are, relative to the fire area.
+ * The official fire area, drawn, with your position in it.
  *
- * "You are inside the fire area" is a sentence a person has to convert into
- * a picture in their own head, under stress, possibly in a second language.
- * This draws the picture: a ground plane in perspective, the fire area on
- * it, and you.
+ * This renders the actual polygon the NSW RFS published, not an
+ * illustration of one. The shape, the scale and where you sit inside it are
+ * all the feed's own geometry.
  *
- * WHAT IT IS NOT
+ * WHAT IT DELIBERATELY IS NOT
  *
- * It is not a map. There are no roads, no landmarks, no north, and no
- * direction of travel, because the official feed supports none of those and
- * a diagram that implied them would be inventing an evacuation route. It
- * shows exactly three facts, all of which the feed provides: that a fire
- * area exists, how far away it is, and whether you are within it.
+ * There are no map tiles. A tile map requests imagery for the area you are
+ * standing in, which tells the tile provider where you are, and SafeSignal's
+ * whole privacy claim is that your location never leaves the device. Tiles
+ * would also stop this working offline, which is when it matters most.
  *
- * It is decorative to assistive technology on purpose: every fact in it is
- * already stated in text directly above, and announcing a schematic twice
- * helps nobody.
+ * There is no route, no arrow and no suggested direction. Deciding which way
+ * to go from two polygons would be inventing evacuation advice: the fire
+ * moves, roads close, and an area with no polygon on it has not been
+ * declared safe by anyone. When the RFS gives a direction it appears in the
+ * official wording below, in their words, and that is the only place a
+ * direction ever comes from.
  */
 export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
   const pack = usePack()
+  const { profile } = useProfile()
   const root = useRef<SVGSVGElement>(null)
-  const stage = useRef<HTMLDivElement>(null)
-  /** Tilt in degrees. Dragging changes it; nothing depends on it. */
   const [tilt, setTilt] = useState(46)
 
   const inside = relevant.verdict === 'affected'
   const distanceKm = relevant.distanceKm
-  // Nothing to draw without either containment or a distance. Computed
-  // before the effect so the hook order never changes between renders.
-  const drawable = inside || distanceKm !== null
+  const at = profile.location
+
+  const shape = useMemo(() => {
+    const { usable } = usablePolygons(relevant.warning.polygons)
+    if (usable.length === 0) return null
+
+    const extra = at ? [{ lat: at.lat, lon: at.lon }] : []
+    const raw = boundsOf(usable, extra)
+    if (!raw) return null
+
+    const project = projector(padBounds(raw), VIEW)
+    return {
+      paths: usable.map((ring) => ringToPath(ring, project)).filter(Boolean),
+      you: at ? project({ lat: at.lat, lon: at.lon }) : null,
+      centre: relevant.warning.point ? project(relevant.warning.point) : null,
+    }
+  }, [relevant.warning.polygons, relevant.warning.point, at])
+
+  const drawable = shape !== null || inside || distanceKm !== null
 
   useEffect(() => {
     const svg = root.current
@@ -45,33 +65,23 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
 
     const stage = svg.closest('.pd__stage')
     const rings = svg.querySelectorAll('.pd__ring')
-    const area = svg.querySelector('.pd__area')
+    const area = svg.querySelectorAll('.pd__area')
     const you = stage?.querySelector('.pd__pin') ?? null
 
     const tl = gsap.timeline({ defaults: { ease: 'power2.out' } })
-    // The ground settles first, then the fire, then you. The order is the
-    // order the picture is meant to be read in.
     tl.from(rings, { scale: 0.92, opacity: 0.2, duration: 0.4, stagger: 0.05, transformOrigin: 'center' }, 0)
-    if (area) tl.from(area, { scale: 0.8, opacity: 0.3, duration: 0.45, transformOrigin: 'center' }, 0.12)
-    // The pin drops onto the plane. It is the last thing to arrive, so the
-    // eye lands on it after the ground it stands on has been read.
+    if (area.length) {
+      tl.from(area, { scale: 0.88, opacity: 0.3, duration: 0.45, transformOrigin: 'center' }, 0.12)
+    }
     if (you) tl.from(you, { y: -18, opacity: 0.4, duration: 0.42, ease: 'power3.out' }, 0.26)
 
     return () => {
       tl.kill()
-      gsap.set([...Array.from(rings), area, you].filter(Boolean) as Element[], { clearProps: 'all' })
+      gsap.set([...Array.from(rings), ...Array.from(area), you].filter(Boolean) as Element[],
+        { clearProps: 'all' })
     }
-  }, [inside, distanceKm, drawable])
+  }, [inside, distanceKm, shape, drawable])
 
-  /**
-   * Dragging tilts the ground plane.
-   *
-   * Deliberately an enhancement and never a requirement: the diagram is
-   * fully legible before anyone touches it, every fact in it is stated in
-   * text above, and the arrow keys do the same job for anyone not using a
-   * pointer. The tilt is clamped so the plane can never be turned edge-on
-   * and made unreadable.
-   */
   const nudge = (delta: number) => setTilt((t) => Math.min(74, Math.max(8, t + delta)))
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -80,10 +90,8 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
     const startTilt = tilt
     const target = event.currentTarget
     target.setPointerCapture(event.pointerId)
-
-    const move = (e: PointerEvent) => {
+    const move = (e: PointerEvent) =>
       setTilt(Math.min(74, Math.max(8, startTilt + (e.clientY - startY) * 0.35)))
-    }
     const up = () => {
       target.releasePointerCapture(event.pointerId)
       target.removeEventListener('pointermove', move)
@@ -95,19 +103,20 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
 
   if (!drawable) return null
 
-  // Inside means the area covers you, so it is drawn around the centre.
-  // Outside, it sits away from you at a distance the rings can be read
-  // against - never in a compass direction, because the feed has none.
-  const offset = Math.min(64, 26 + (distanceKm ?? 0) * 2.6)
+  // Without published geometry there is no shape to draw, so the view falls
+  // back to a distance ring. It says less because the feed said less.
+  const fallbackRadius = inside ? 58 : 30
+  const fallbackY = inside ? 100 : 100 - Math.min(64, 26 + (distanceKm ?? 0) * 2.6)
 
   const label = inside
     ? pack.ui.youAreInside
-    : `${distanceKm?.toFixed(1)} ${pack.ui.kmAway}`
+    : distanceKm !== null
+      ? `${distanceKm.toFixed(1)} ${pack.ui.kmAway}`
+      : ''
 
   return (
     <figure className={`pd${inside ? ' pd--inside' : ''}`}>
       <div
-        ref={stage}
         className="pd__stage"
         style={{ ['--pd-tilt' as string]: `${tilt}deg` }}
         onPointerDown={onPointerDown}
@@ -122,46 +131,52 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
         <svg
           ref={root}
           className="pd__svg"
-          viewBox="0 0 200 200"
+          viewBox={`0 0 ${VIEW} ${VIEW}`}
           role="img"
           aria-hidden="true"
           focusable="false"
         >
-          {/* Distance rings. A scale to read depth against, not a map. */}
           {[34, 62, 90].map((r) => (
             <circle key={r} className="pd__ring" cx="100" cy="100" r={r} />
           ))}
 
-          {/* The fire area. Soft edged, because its boundary is an estimate
-              and a hard edge would claim precision the feed does not have. */}
-          <circle
-            className="pd__area"
-            cx="100"
-            cy={inside ? 100 : 100 - offset}
-            r={inside ? 58 : 30}
-          />
+          {shape
+            ? shape.paths.map((d, i) => <path key={i} className="pd__area" d={d} />)
+            : <circle className="pd__area" cx="100" cy={fallbackY} r={fallbackRadius} />}
 
-          {/* The shadow the pin casts on the plane. This is the cue that
-              makes the tilt read as ground rather than as an ellipse. */}
-          <ellipse className="pd__shadow" cx="100" cy="100" rx="10" ry="10" />
+          <ellipse
+            className="pd__shadow"
+            cx={shape?.you?.x ?? 100}
+            cy={shape?.you?.y ?? 100}
+            rx="10"
+            ry="10"
+          />
         </svg>
 
-        {/*
-          You, standing on the plane rather than lying in it.
-
-          The ground tilts and the pin does not, which is the whole reason
-          the diagram reads as space. A pin drawn inside the tilted SVG
-          would lie flat with it and the third dimension would vanish.
-        */}
-        <div className="pd__pin" aria-hidden="true">
+        {/* You. Upright while the ground tilts away beneath it. */}
+        <div
+          className="pd__pin"
+          aria-hidden="true"
+          style={
+            shape?.you
+              ? {
+                  left: `${(shape.you.x / VIEW) * 100}%`,
+                  top: `${(shape.you.y / VIEW) * 100}%`,
+                }
+              : undefined
+          }
+        >
           <span className="pd__stem" />
           <span className="pd__head" />
         </div>
       </div>
 
-      {/* The caption carries the same fact as the text above it, so the
-          diagram never becomes the only place something is said. */}
-      <figcaption className="pd__caption">{label}</figcaption>
+      <figcaption className="pd__caption">
+        {label}
+        {/* An area with no polygon on it has not been declared safe. Saying
+            so here is the difference between a diagram and a promise. */}
+        <span className="pd__disclaimer">{pack.ui.diagramNotAMap}</span>
+      </figcaption>
     </figure>
   )
 }

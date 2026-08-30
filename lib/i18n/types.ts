@@ -101,6 +101,7 @@ export const UI_KEYS = [
   'warningChanged',
   'otherWarnings',
   'tiltDiagram',
+  'diagramNotAMap',
   'officialMessageLabel',
   'explanationLabel',
   'explanationNote',

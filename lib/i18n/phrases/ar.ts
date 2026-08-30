@@ -148,6 +148,7 @@ export const ar: PhrasePack = {
     warningChanged: 'تغيّر هذا التحذير',
     otherWarnings: 'تحذيرات أخرى قريبة منك',
     tiltDiagram: 'رسم توضيحي لموقعك ومنطقة الحريق. اسحب أو استخدم مفاتيح الأسهم لإمالته.',
+    diagramNotAMap: 'منطقة الحريق الرسمية فقط. المناطق غير المعروضة لم يُعلن أنها آمنة.',
     officialMessageLabel: 'الرسالة الرسمية',
     explanationLabel: 'شرح SafeSignal',
     explanationNote: 'تُرجم وبُسّط بواسطة SafeSignal. الرسالة الرسمية أعلاه هي المرجع.',

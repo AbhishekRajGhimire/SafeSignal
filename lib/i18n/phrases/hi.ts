@@ -145,6 +145,7 @@ export const hi: PhrasePack = {
     warningChanged: 'यह चेतावनी बदल गई है',
     otherWarnings: 'आपके पास की अन्य चेतावनियाँ',
     tiltDiagram: 'आपकी जगह और आग के क्षेत्र का चित्र। झुकाने के लिए खींचें या एरो कुंजी दबाएँ।',
+    diagramNotAMap: 'केवल आधिकारिक आग क्षेत्र। जो क्षेत्र नहीं दिखाए गए, उन्हें सुरक्षित घोषित नहीं किया गया है।',
     officialMessageLabel: 'आधिकारिक संदेश',
     explanationLabel: 'SafeSignal की व्याख्या',
     explanationNote: 'SafeSignal द्वारा अनुवादित और सरल किया गया। ऊपर दिया आधिकारिक संदेश ही मान्य है।',

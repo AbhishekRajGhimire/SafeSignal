@@ -35,18 +35,28 @@ const DEMO_PROVENANCE: WarningProvenance = {
 }
 
 /**
- * A ring roughly one kilometre across, centred on the anchor, so demo mode
- * exercises the real polygon-containment path rather than skipping it.
+ * An irregular ring around the anchor, so demo mode exercises the real
+ * polygon-containment path rather than skipping it.
+ *
+ * Deliberately not a square. Real RFS fire polygons are ragged, and a demo
+ * drawn as a neat box would misrepresent both the data and the diagram that
+ * renders it. The radii are fixed rather than random so the scenario is
+ * identical every time it is presented.
  */
+const RAGGED = [1.0, 0.72, 0.88, 0.61, 0.95, 0.7, 1.05, 0.78, 0.92, 0.66, 1.08, 0.83]
+
 function ringAround(centre: LatLon, halfKm: number) {
-  const d = halfKm * KM_IN_DEGREES
-  return [
-    { lat: centre.lat - d, lon: centre.lon - d },
-    { lat: centre.lat - d, lon: centre.lon + d },
-    { lat: centre.lat + d, lon: centre.lon + d },
-    { lat: centre.lat + d, lon: centre.lon - d },
-    { lat: centre.lat - d, lon: centre.lon - d },
-  ]
+  const ring = RAGGED.map((factor, i) => {
+    const angle = (i / RAGGED.length) * Math.PI * 2
+    const d = halfKm * KM_IN_DEGREES * factor
+    return {
+      lat: centre.lat + Math.sin(angle) * d,
+      // Longitude degrees are shorter this far south, so the same ground
+      // distance needs more of them or the shape comes out squashed.
+      lon: centre.lon + (Math.cos(angle) * d) / Math.cos((centre.lat * Math.PI) / 180),
+    }
+  })
+  return [...ring, ring[0]]
 }
 const minutesAfter = (minutes: number) => new Date(BASE.getTime() + minutes * 60_000)
 

@@ -145,6 +145,7 @@ export const ne: PhrasePack = {
     warningChanged: 'यो चेतावनी बदलिएको छ',
     otherWarnings: 'तपाईंको नजिकका अन्य चेतावनी',
     tiltDiagram: 'तपाईंको स्थान र आगोको क्षेत्रको चित्र। ढल्काउन तान्नुहोस् वा एरो कुञ्जी प्रयोग गर्नुहोस्।',
+    diagramNotAMap: 'आधिकारिक आगो क्षेत्र मात्र। नदेखाइएका क्षेत्रहरू सुरक्षित घोषित गरिएका होइनन्।',
     officialMessageLabel: 'आधिकारिक सन्देश',
     explanationLabel: 'SafeSignal को व्याख्या',
     explanationNote: 'SafeSignal ले अनुवाद र सरल बनाएको। माथिको आधिकारिक सन्देश नै आधिकारिक हो।',

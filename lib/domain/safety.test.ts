@@ -258,11 +258,30 @@ describe('motion never gates emergency information', () => {
 describe('the proximity diagram is a schematic, never a map', () => {
   const diagram = readFileSync('components/warning/ProximityDiagram.tsx', 'utf8')
 
+  it('draws the published polygon, not an illustration of one', () => {
+    expect(diagram).toContain('relevant.warning.polygons')
+    expect(diagram).toContain('ringToPath')
+  })
+
   it('draws only facts the official feed provides', () => {
-    // Containment and distance. Nothing else is available, and anything
-    // else drawn would be invented.
     expect(diagram).toContain("relevant.verdict === 'affected'")
     expect(diagram).toContain('relevant.distanceKm')
+  })
+
+  it('loads no map tiles, so location cannot leak and it works offline', () => {
+    // Comments stripped first: the file explains at length why there are no
+    // tiles, and matching that prose would be matching the wrong thing.
+    const code = diagram
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/\/\/.*$/gm, '')
+      .replace(/\{\/\*[\s\S]*?\*\/\}/g, '')
+    expect(code).not.toMatch(/tile|openstreetmap|mapbox|arcgis|basemap/i)
+    const css = readFileSync('app/globals.css', 'utf8')
+    expect(css).not.toMatch(/url\(https?:/)
+  })
+
+  it('says that unmarked areas have not been declared safe', () => {
+    expect(diagram).toContain('diagramNotAMap')
   })
 
   it('has no direction, bearing or heading in its code', () => {

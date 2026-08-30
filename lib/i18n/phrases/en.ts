@@ -145,6 +145,7 @@ export const en: PhrasePack = {
     warningChanged: 'This warning has changed',
     otherWarnings: 'Other warnings near you',
     tiltDiagram: 'Diagram of your location and the fire area. Drag or use the arrow keys to tilt it.',
+    diagramNotAMap: 'Official fire area only. Areas not shown have not been declared safe.',
     officialMessageLabel: 'Official message',
     explanationLabel: 'SafeSignal explanation',
     explanationNote: 'Translated and simplified by SafeSignal. The official message above is the source of truth.',

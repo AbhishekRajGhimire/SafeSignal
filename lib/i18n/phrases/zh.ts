@@ -145,6 +145,7 @@ export const zh: PhrasePack = {
     warningChanged: '此警报已更新',
     otherWarnings: '您附近的其他警报',
     tiltDiagram: '您所在位置与火场范围的示意图。可拖动或使用方向键调整角度。',
+    diagramNotAMap: '仅显示官方火场范围。未显示的区域并不代表安全。',
     officialMessageLabel: '官方消息',
     explanationLabel: 'SafeSignal 说明',
     explanationNote: '由 SafeSignal 翻译并简化。以上官方消息为准。',

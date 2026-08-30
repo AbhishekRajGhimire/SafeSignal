@@ -145,6 +145,7 @@ export const vi: PhrasePack = {
     warningChanged: 'Cảnh báo này đã thay đổi',
     otherWarnings: 'Các cảnh báo khác gần bạn',
     tiltDiagram: 'Sơ đồ vị trí của bạn và vùng cháy. Kéo hoặc dùng phím mũi tên để nghiêng.',
+    diagramNotAMap: 'Chỉ hiển thị vùng cháy chính thức. Khu vực không hiển thị chưa được tuyên bố là an toàn.',
     officialMessageLabel: 'Thông điệp chính thức',
     explanationLabel: 'Giải thích của SafeSignal',
     explanationNote: 'Do SafeSignal dịch và đơn giản hoá. Thông điệp chính thức ở trên mới là căn cứ.',
