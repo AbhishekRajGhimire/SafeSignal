@@ -71,6 +71,13 @@ export const vi: PhrasePack = {
     otherServices: 'Các số điện thoại khác',
     sourceRfs: 'Nguồn: Sở Cứu hỏa Nông thôn NSW',
 
+    introTagline: 'Cảnh báo cháy rừng chính thức của New South Wales, bằng ngôn ngữ của bạn và bằng lời đơn giản.',
+    introChooseLanguage: 'Chọn ngôn ngữ của bạn',
+    introForTitle: 'Ứng dụng này dành cho bạn nếu:',
+    introForLanguage: 'bạn đọc tiếng Anh không dễ dàng',
+    introForText: 'bạn cần chữ to hơn, hoặc cần nghe cảnh báo đọc lên',
+    introForHelp: 'bạn cần người giúp để rời khỏi nhà',
+
     setupTitle: 'Hãy cho SafeSignal biết chúng tôi nên liên lạc với bạn thế nào',
     setupIntro: 'Vài câu hỏi ngắn, để cảnh báo đến với bạn theo cách phù hợp.',
     setupReassure: 'Thông tin này ở lại trên điện thoại của bạn. Không có gì được gửi cho chúng tôi. Bạn có thể đổi bất cứ lúc nào.',

@@ -71,6 +71,13 @@ export const zh: PhrasePack = {
     otherServices: '其他电话号码',
     sourceRfs: '来源：新南威尔士州乡村消防局',
 
+    introTagline: '新南威尔士州官方山火警报，用您的语言，用简单的话。',
+    introChooseLanguage: '选择您的语言',
+    introForTitle: '如果您符合以下情况，这个应用就是为您做的：',
+    introForLanguage: '您看英文不太容易',
+    introForText: '您需要更大的字，或者需要把警报读出来',
+    introForHelp: '您离开住处时需要别人帮忙',
+
     setupTitle: '请告诉 SafeSignal 我们该如何与您沟通',
     setupIntro: '几个简单的问题，让警报以适合您的方式送达。',
     setupReassure: '这些信息只保存在您的手机上，不会发送给我们。您可以随时更改。',

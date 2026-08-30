@@ -39,3 +39,7 @@ Last verified 2026-08-30 against the deployed build.
 
 `docs/02-JUDGING.md` weights Implementation at 30 of 70 stated points, and warns that stopping the demo at comprehension answers the use case only halfway.
 The demo should run through to action: the ranked services, and the English call script with the reader's own language beside it.
+
+**Start the demo at `/`, not at `/?demo=1`.**
+The intro screen is where SafeSignal says who it is for, and `?demo=1` skips it by design so a real user lands on the warning rather than a settings wizard.
+Spend five seconds there, tap a language button to show the whole screen change, then tap Demo mode and continue.

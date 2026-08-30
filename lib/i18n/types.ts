@@ -25,6 +25,13 @@ export const UI_KEYS = [
   'shareSituation',
   'otherServices',
   'sourceRfs',
+  // Intro screen
+  'introTagline',
+  'introChooseLanguage',
+  'introForTitle',
+  'introForLanguage',
+  'introForText',
+  'introForHelp',
   // Setup: framing
   'setupTitle',
   'setupIntro',

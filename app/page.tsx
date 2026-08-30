@@ -14,6 +14,7 @@ import {
   StaleDataPanel,
 } from '@/components/warning/StatePanel'
 import { DemoControls } from '@/components/DemoControls'
+import { IntroScreen } from '@/components/IntroScreen'
 import { assess } from '@/lib/domain/match'
 import { screenStateFrom, isEscalation } from '@/lib/domain/screenState'
 import { summariseWarningChange } from '@/lib/domain/changeSummary'
@@ -72,20 +73,7 @@ export default function Home() {
   // Demo mode bypasses the setup gate on purpose. Someone opening the shared
   // link cold must land on the scenario, not on a settings wizard.
   if (!profile.completedSetup && !demoMode) {
-    return (
-      <main className="screen screen--intro">
-        <h1>SafeSignal</h1>
-        <p className="lede">{pack.ui.setupIntro}</p>
-        <Link className="button" href="/setup">{pack.ui.saveAndContinue}</Link>
-        <button
-          type="button"
-          className="button button--secondary"
-          onClick={() => setDemoMode(true)}
-        >
-          {pack.ui.switchToDemo}
-        </button>
-      </main>
-    )
+    return <IntroScreen onDemo={() => setDemoMode(true)} />
   }
 
   const emergency = state === 'warning' || state === 'warning-updated'

@@ -71,6 +71,13 @@ export const en: PhrasePack = {
     otherServices: 'Other phone numbers',
     sourceRfs: 'Source: NSW Rural Fire Service',
 
+    introTagline: 'Official NSW bushfire warnings, in your language and in plain words.',
+    introChooseLanguage: 'Choose your language',
+    introForTitle: 'This is built for you if:',
+    introForLanguage: 'you do not read English easily',
+    introForText: 'you need larger text, or warnings read aloud',
+    introForHelp: 'you would need help to leave',
+
     setupTitle: 'Tell SafeSignal how we should communicate with you',
     setupIntro: 'A few quick questions so warnings reach you in a way that works for you.',
     setupReassure: 'This stays on your phone. Nothing is sent to us. You can change it any time.',
