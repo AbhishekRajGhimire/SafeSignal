@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { buildScenarios, type DemoScenarioId } from './scenario'
 import { DemoSource } from './demo'
-import { enterScenario, leaveDemo } from './demoProfile'
+import { enterDemo, enterScenario, restoreDemo, leaveDemo } from './demoProfile'
 import { assessLocation } from '@/lib/domain/relevance'
 import { screenStateFrom } from '@/lib/domain/screenState'
 import { summariseWarningChange } from '@/lib/domain/changeSummary'
@@ -218,34 +218,67 @@ describe('the presenter profile is borrowed, never taken', () => {
     completedSetup: true,
   }
 
-  it('stashes the real profile when a preset scenario is chosen', () => {
-    const transition = enterScenario(mine, null, byId('accessibility-profile'))
-    expect(transition.patch).toEqual(byId('accessibility-profile').profilePreset)
+  /** What the presenter's settings look like after a judge has fiddled. */
+  const fiddled: UserProfile = { ...mine, language: 'zh', textSize: 'x-large' }
+
+  it('stashes the whole profile the moment demo mode begins', () => {
+    const transition = enterDemo(mine)
+    expect(transition.patch).toBeNull()
     expect(transition.stash).toEqual(mine)
   })
 
-  it('does not overwrite the stash when moving between preset scenarios', () => {
-    const first = enterScenario(mine, null, byId('accessibility-profile'))
-    const preset = { ...mine, ...byId('accessibility-profile').profilePreset } as UserProfile
-    const second = enterScenario(preset, first.stash, byId('accessibility-profile'))
-    // The stash still holds the presenter's own settings, not the preset.
-    expect(second.stash).toEqual(mine)
+  it('keeps the stash across a preset scenario', () => {
+    const stash = enterDemo(mine).stash
+    const entered = enterScenario(stash, byId('accessibility-profile'))
+    expect(entered.patch).toEqual(byId('accessibility-profile').profilePreset)
+    expect(entered.stash).toEqual(mine)
+  })
+
+  it('keeps the stash across every scenario switch', () => {
+    const stash = enterDemo(mine).stash
+    const first = enterScenario(stash, byId('accessibility-profile'))
+    const second = enterScenario(first.stash, byId('escalation'))
+    const third = enterScenario(second.stash, byId('accessibility-profile'))
+    // The stash still holds the presenter's own settings, not a preset.
+    expect(third.stash).toEqual(mine)
   })
 
   it('restores the real profile on a scenario with no preset', () => {
-    const entered = enterScenario(mine, null, byId('accessibility-profile'))
-    const restored = enterScenario(mine, entered.stash, byId('no-warning'))
+    const stash = enterDemo(mine).stash
+    const restored = enterScenario(stash, byId('no-warning'))
     expect(restored.patch).toEqual(mine)
-    expect(restored.stash).toBeNull()
+    // Still in demo mode, so the stash must survive to be restored again.
+    expect(restored.stash).toEqual(mine)
   })
 
-  it('restores the real profile on reset and on leaving demo mode', () => {
-    const entered = enterScenario(mine, null, byId('accessibility-profile'))
-    expect(leaveDemo(entered.stash)).toEqual({ patch: mine, stash: null })
+  it('undoes a hand-made language change on reset, not just a scenario preset', () => {
+    // The reported bug: changing language through the settings screen during
+    // a demo was never stashed, so Reset demo left it in place.
+    const stash = enterDemo(mine).stash
+    expect(restoreDemo(stash).patch).toEqual(mine)
+    expect(restoreDemo(stash).patch).not.toEqual(fiddled)
+  })
+
+  it('keeps the stash on reset, because the demo is still running', () => {
+    const stash = enterDemo(mine).stash
+    expect(restoreDemo(stash).stash).toEqual(mine)
+  })
+
+  it('restores the real profile and drops the stash on leaving demo mode', () => {
+    const stash = enterDemo(mine).stash
+    expect(leaveDemo(stash)).toEqual({ patch: mine, stash: null })
   })
 
   it('leaves the profile alone when nothing was ever stashed', () => {
     expect(leaveDemo(null)).toEqual({ patch: null, stash: null })
+    expect(restoreDemo(null)).toEqual({ patch: null, stash: null })
+  })
+
+  it('restores a cold device to its defaults, not to a judge’s settings', () => {
+    // A booth phone opened at ?demo=1 has never been set up. Whatever the
+    // last judge selected must not become the next judge's starting state.
+    const cold = enterDemo(DEFAULT_PROFILE).stash
+    expect(restoreDemo(cold).patch).toEqual(DEFAULT_PROFILE)
   })
 })
 

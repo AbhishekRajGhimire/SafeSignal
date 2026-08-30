@@ -7,7 +7,13 @@ import { buildScenarios, type DemoScenario, type DemoScenarioId } from '@/lib/so
 import { EMPTY_FEED, type WarningFeed } from '@/lib/sources/types'
 import { DEFAULT_DEMO_PLACE } from '@/lib/locations/nsw'
 import type { UserProfile } from '@/lib/domain/profile'
-import { enterScenario, leaveDemo } from '@/lib/sources/demoProfile'
+import {
+  enterDemo,
+  enterScenario,
+  leaveDemo,
+  restoreDemo,
+  type ProfileTransition,
+} from '@/lib/sources/demoProfile'
 import { useProfile } from './ProfileProvider'
 
 interface WarningContextValue {
@@ -38,12 +44,12 @@ const WarningContext = createContext<WarningContextValue | null>(null)
 const DEFAULT_SCENARIO: DemoScenarioId = 'escalation'
 
 export function WarningProvider({ children }: { children: React.ReactNode }) {
-  const { profile, update, ready } = useProfile()
+  const { profile, update, ready, setPersist } = useProfile()
   const [demoMode, setDemoMode] = useState(false)
   const [scenarioId, setScenarioId] = useState<DemoScenarioId>(DEFAULT_SCENARIO)
   const [feed, setFeed] = useState<WarningFeed>(EMPTY_FEED)
   const [demoState, setDemoState] = useState<DemoState | null>(null)
-  /** The person's real profile, stashed while a scenario preset is applied. */
+  /** The person's real profile, stashed for as long as demo mode runs. */
   const stashedProfile = useRef<UserProfile | null>(null)
 
   // A judge opening the shared link must reach the scenario without being
@@ -53,6 +59,27 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
       setDemoMode(true)
     }
   }, [])
+
+  // Demo mode borrows the whole profile, not just the fields a scenario
+  // preset touches, and stops it reaching storage until it is given back.
+  //
+  // Waits for `ready`: before the stored profile has loaded, `profile` is
+  // still DEFAULT_PROFILE, and stashing that would overwrite the person's
+  // real settings with defaults when the demo ended.
+  useEffect(() => {
+    if (!ready) return
+    if (!demoMode) {
+      setPersist(true)
+      return
+    }
+    if (!stashedProfile.current) {
+      stashedProfile.current = enterDemo(profile).stash
+    }
+    setPersist(false)
+    // `profile` is read, deliberately not depended on: the stash is a
+    // snapshot of the moment demo mode began, and must not follow later edits.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [demoMode, ready, setPersist])
 
   const anchorLat = profile.location?.lat ?? DEFAULT_DEMO_PLACE.lat
   const anchorLon = profile.location?.lon ?? DEFAULT_DEMO_PLACE.lon
@@ -96,7 +123,7 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
     return live.subscribe(setFeed)
   }, [demo, ready])
 
-  const applyTransition = (transition: ReturnType<typeof leaveDemo>) => {
+  const applyTransition = (transition: ProfileTransition) => {
     if (transition.patch) update(transition.patch)
     stashedProfile.current = transition.stash
   }
@@ -104,12 +131,14 @@ export function WarningProvider({ children }: { children: React.ReactNode }) {
   const selectScenario = (id: DemoScenarioId) => {
     const next = scenarios.find((s) => s.id === id)
     if (!next) return
-    applyTransition(enterScenario(profile, stashedProfile.current, next))
+    applyTransition(enterScenario(stashedProfile.current, next))
     setScenarioId(id)
   }
 
   const resetDemo = () => {
-    applyTransition(leaveDemo(stashedProfile.current))
+    // Undoes a preset and a hand-made language or text size change alike, and
+    // keeps the stash, because the presenter is still in demo mode.
+    applyTransition(restoreDemo(stashedProfile.current))
     setScenarioId(DEFAULT_SCENARIO)
     demo?.restart()
   }

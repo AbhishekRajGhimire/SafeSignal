@@ -14,6 +14,15 @@ interface ProfileContextValue {
   profile: UserProfile
   update: (patch: Partial<UserProfile>) => void
   ready: boolean
+  /**
+   * Turns storage writes off while demo mode borrows the profile.
+   *
+   * A demo changes real settings: scenario 6 applies an accessibility preset,
+   * and a presenter may switch language or text size to show a judge. None of
+   * that belongs on the device. Restoring the stash on exit is not enough on
+   * its own, because a browser closed mid-demo never reaches the exit.
+   */
+  setPersist: (on: boolean) => void
 }
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
@@ -21,6 +30,7 @@ const ProfileContext = createContext<ProfileContextValue | null>(null)
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE)
   const [ready, setReady] = useState(false)
+  const [persist, setPersist] = useState(true)
 
   // localStorage is only available after hydration, so the first render uses
   // defaults and this fills in the real profile.
@@ -43,15 +53,18 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   // `ready` guard stops the first render writing defaults over a real
   // stored profile before the load above has run.
   useEffect(() => {
-    if (!ready) return
+    if (!ready || !persist) return
     saveProfile(profile)
-  }, [profile, ready])
+  }, [profile, ready, persist])
 
   const update = useCallback((patch: Partial<UserProfile>) => {
     setProfile((current) => ({ ...current, ...patch }))
   }, [])
 
-  const value = useMemo(() => ({ profile, update, ready }), [profile, update, ready])
+  const value = useMemo(
+    () => ({ profile, update, ready, setPersist }),
+    [profile, update, ready],
+  )
 
   return <ProfileContext.Provider value={value}>{children}</ProfileContext.Provider>
 }
