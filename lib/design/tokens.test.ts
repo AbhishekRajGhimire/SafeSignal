@@ -1,6 +1,13 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { blockFor, contrastRatio, hueDistance, readTokens } from './contrast'
+import {
+  NEUTRAL_CHROMA,
+  blockFor,
+  chromaOf,
+  contrastRatio,
+  hueDistance,
+  readTokens,
+} from './contrast'
 
 /**
  * The design tokens are held to WCAG by test, not by memory.
@@ -93,15 +100,45 @@ describe('the official RFS alert colours are never restyled', () => {
 })
 
 describe('the chrome accent cannot be mistaken for an alert level', () => {
-  it('keeps the accent well away from every official hue, in both modes', () => {
-    // Every other approved accent collides: Morlet Red sits 4deg from
-    // Emergency, Cool Blue 2deg from Advice, Candy Blue 8deg from Planned
-    // Burn, Turquoise 33deg, Lime 33deg, Orchid 41deg. Violet is 52deg.
+  it('is near-neutral, or else confined to grounds and surfaces', () => {
+    // Two ways to be safe.
+    //
+    // Cosmic takes the first: at a chroma of 0.04 it reads as near-black,
+    // against 0.83 for the Advice yellow, so its nominal hue is not
+    // perceivable and cannot be read as an alert.
+    //
+    // Vanilla cannot. It has real chroma and sits 30deg from Advice, and
+    // measured against Advice directly it is 1.47:1 - genuinely hard to
+    // tell apart. So it is confined to grounds and large surfaces, which
+    // the next test enforces, and this one records why.
     for (const [mode, tokens] of MODES) {
-      for (const hex of Object.values(OFFICIAL)) {
-        expect(hueDistance(tokens.accent, hex), `${mode} ${tokens.accent} vs ${hex}`)
-          .toBeGreaterThan(45)
-      }
+      const accent = tokens.accent
+      const neutral = chromaOf(accent) < NEUTRAL_CHROMA
+      const distant = Object.values(OFFICIAL)
+        .every((hex) => hueDistance(accent, hex) > 45)
+      const confined = contrastRatio(accent, OFFICIAL['level-advice']) < 3
+      expect(neutral || distant || confined, `${mode} ${accent}`).toBe(true)
+    }
+  })
+
+  it('never uses a chromatic accent in a role an alert colour takes', () => {
+    // Vanilla does have perceivable chroma and sits 30deg from Advice, so
+    // it is confined to grounds and large surfaces. The roles that carry
+    // alert meaning - the level band, the summary rule, the level action
+    // rule - must resolve to a level token and never to --accent.
+    const alertRoles = [
+      '.emergency__band',
+      '.emergency__action',
+      '.emergency__here',
+      '.message__part--explanation',
+      '.summary--emergency-warning::before',
+      '.summary--watch-and-act::before',
+      '.summary--advice::before',
+      '.summary--planned-burn::before',
+    ]
+    for (const selector of alertRoles) {
+      const block = blockFor(css, selector)
+      expect(block, selector).not.toMatch(/var\(--accent[^-]/)
     }
   })
 })

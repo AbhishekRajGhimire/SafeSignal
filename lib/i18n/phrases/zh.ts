@@ -144,6 +144,7 @@ export const zh: PhrasePack = {
     loadingTitle: '正在准备您的设置',
     warningChanged: '此警报已更新',
     otherWarnings: '您附近的其他警报',
+    tiltDiagram: '您所在位置与火场范围的示意图。可拖动或使用方向键调整角度。',
     officialMessageLabel: '官方消息',
     explanationLabel: 'SafeSignal 说明',
     explanationNote: '由 SafeSignal 翻译并简化。以上官方消息为准。',

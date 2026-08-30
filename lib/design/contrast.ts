@@ -59,3 +59,20 @@ export function blockFor(css: string, selector: string): string {
   const close = css.indexOf('}', open)
   return css.slice(open, close)
 }
+
+/**
+ * Chroma, as max minus min channel.
+ *
+ * A near-neutral colour cannot be mistaken for a saturated alert colour
+ * whatever its nominal hue: Cosmic reads as near-black at a chroma of
+ * 0.04, against 0.83 for the Advice yellow. Hue comparisons are only
+ * meaningful once there is enough chroma to perceive one.
+ */
+export function chromaOf(hex: string): number {
+  const h = hex.replace('#', '')
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255)
+  return Math.max(r, g, b) - Math.min(r, g, b)
+}
+
+/** Below this, a colour reads as neutral rather than as a hue. */
+export const NEUTRAL_CHROMA = 0.15

@@ -144,6 +144,7 @@ export const en: PhrasePack = {
     loadingTitle: 'Getting your settings ready',
     warningChanged: 'This warning has changed',
     otherWarnings: 'Other warnings near you',
+    tiltDiagram: 'Diagram of your location and the fire area. Drag or use the arrow keys to tilt it.',
     officialMessageLabel: 'Official message',
     explanationLabel: 'SafeSignal explanation',
     explanationNote: 'Translated and simplified by SafeSignal. The official message above is the source of truth.',

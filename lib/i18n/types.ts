@@ -100,6 +100,7 @@ export const UI_KEYS = [
   'loadingTitle',
   'warningChanged',
   'otherWarnings',
+  'tiltDiagram',
   'officialMessageLabel',
   'explanationLabel',
   'explanationNote',

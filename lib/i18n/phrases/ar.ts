@@ -147,6 +147,7 @@ export const ar: PhrasePack = {
     loadingTitle: 'نجهّز إعداداتك',
     warningChanged: 'تغيّر هذا التحذير',
     otherWarnings: 'تحذيرات أخرى قريبة منك',
+    tiltDiagram: 'رسم توضيحي لموقعك ومنطقة الحريق. اسحب أو استخدم مفاتيح الأسهم لإمالته.',
     officialMessageLabel: 'الرسالة الرسمية',
     explanationLabel: 'شرح SafeSignal',
     explanationNote: 'تُرجم وبُسّط بواسطة SafeSignal. الرسالة الرسمية أعلاه هي المرجع.',

@@ -290,6 +290,23 @@ describe('the proximity diagram is a schematic, never a map', () => {
     expect(diagram).toContain('pack.ui.youAreInside')
   })
 
+  it('is legible before anyone interacts with it', () => {
+    // The tilt is an enhancement. The diagram renders at a readable angle
+    // with no interaction, and every fact in it is in text above.
+    const css = readFileSync('app/globals.css', 'utf8')
+    expect(css).toContain('--pd-tilt: 46deg')
+  })
+
+  it('can be tilted by keyboard as well as by pointer', () => {
+    expect(diagram).toContain("e.key === 'ArrowUp'")
+    expect(diagram).toContain("e.key === 'ArrowDown'")
+    expect(diagram).toContain('tabIndex={0}')
+  })
+
+  it('clamps the tilt so the plane cannot be turned edge-on', () => {
+    expect(diagram).toContain('Math.min(74, Math.max(8')
+  })
+
   it('collapses to a flat plan when motion is unwelcome', () => {
     const css = readFileSync('app/globals.css', 'utf8')
     const reduced = css.slice(css.lastIndexOf('@media (prefers-reduced-motion: reduce)'))

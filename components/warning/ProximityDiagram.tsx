@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 import { usePack } from '../ProfileProvider'
 import { prefersReducedMotion } from '@/lib/motion/reveal'
@@ -29,6 +29,9 @@ import type { RelevantWarning } from '@/lib/domain/match'
 export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
   const pack = usePack()
   const root = useRef<SVGSVGElement>(null)
+  const stage = useRef<HTMLDivElement>(null)
+  /** Tilt in degrees. Dragging changes it; nothing depends on it. */
+  const [tilt, setTilt] = useState(46)
 
   const inside = relevant.verdict === 'affected'
   const distanceKm = relevant.distanceKm
@@ -60,6 +63,36 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
     }
   }, [inside, distanceKm, drawable])
 
+  /**
+   * Dragging tilts the ground plane.
+   *
+   * Deliberately an enhancement and never a requirement: the diagram is
+   * fully legible before anyone touches it, every fact in it is stated in
+   * text above, and the arrow keys do the same job for anyone not using a
+   * pointer. The tilt is clamped so the plane can never be turned edge-on
+   * and made unreadable.
+   */
+  const nudge = (delta: number) => setTilt((t) => Math.min(74, Math.max(8, t + delta)))
+
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion()) return
+    const startY = event.clientY
+    const startTilt = tilt
+    const target = event.currentTarget
+    target.setPointerCapture(event.pointerId)
+
+    const move = (e: PointerEvent) => {
+      setTilt(Math.min(74, Math.max(8, startTilt + (e.clientY - startY) * 0.35)))
+    }
+    const up = () => {
+      target.releasePointerCapture(event.pointerId)
+      target.removeEventListener('pointermove', move)
+      target.removeEventListener('pointerup', up)
+    }
+    target.addEventListener('pointermove', move)
+    target.addEventListener('pointerup', up)
+  }
+
   if (!drawable) return null
 
   // Inside means the area covers you, so it is drawn around the centre.
@@ -73,7 +106,19 @@ export function ProximityDiagram({ relevant }: { relevant: RelevantWarning }) {
 
   return (
     <figure className={`pd${inside ? ' pd--inside' : ''}`}>
-      <div className="pd__stage">
+      <div
+        ref={stage}
+        className="pd__stage"
+        style={{ ['--pd-tilt' as string]: `${tilt}deg` }}
+        onPointerDown={onPointerDown}
+        onKeyDown={(e) => {
+          if (e.key === 'ArrowUp') { nudge(-6); e.preventDefault() }
+          if (e.key === 'ArrowDown') { nudge(6); e.preventDefault() }
+        }}
+        role="group"
+        tabIndex={0}
+        aria-label={pack.ui.tiltDiagram}
+      >
         <svg
           ref={root}
           className="pd__svg"

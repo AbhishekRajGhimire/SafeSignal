@@ -2,20 +2,23 @@
   /* ==========================================================
      SafeSignal design tokens
 
-     Palette: approved Combination G, Lavender #D2C3F6 / Violet #36255C.
+     Palette: approved Combination C, Cosmic #23212C / Vanilla #F1FEC8.
 
-     Chosen for one reason above aesthetics. Every approved accent was
-     measured against the four official RFS alert hues, and every one of
-     them collides: Morlet Red sits 4deg from Emergency, Cool Blue 2deg
-     from Advice, Candy Blue 8deg from Planned Burn, Turquoise 33deg,
-     Lime 33deg, Orchid 41deg. Violet is the furthest away at 52deg, and
-     no fire service anywhere signals with it.
+     Vanilla sits 30deg from the Advice hue, which rules it out as a small
+     accent: a vanilla dot beside a warning could be read as an alert. As a
+     large ground it cannot be, and the measurement that matters bears this
+     out. An Advice band scores 1.47:1 against Vanilla and 1.50:1 against
+     the near-white it replaces, so the palette costs nothing: that band
+     never relied on band-against-page contrast, it relies on dark ink, a
+     distinct shape and a word.
 
      So the rule the whole system hangs on:
 
-       Chrome is violet. Signal is the official RFS colour. They never
-       appear in the same role, and the emergency screen carries exactly
-       one chromatic colour, which belongs to the RFS and not to us.
+       Chrome is Cosmic and Vanilla. Signal is the official RFS colour.
+       Vanilla is only ever a ground or a large surface, never a dot, a
+       badge or a rule, because those are the roles an alert colour takes.
+       The emergency screen carries exactly one chromatic colour, and it
+       belongs to the RFS rather than to us.
 
      60 / 30 / 10 is held as: ground and surfaces 60, ink and structure
      30, violet accent 10 - and on a warning screen the accent budget is
@@ -57,18 +60,20 @@
   --radius: 14px;
   --radius-sm: 10px;
 
-  /* ---- Semantic tokens: light ---- */
-  --bg:            #fbfafc;
-  --surface:       #ffffff;
-  --surface-sunk:  #f5f3f9;
-  --text:          #1c132f;   /* 17.74:1 on surface */
-  --text-2:        #49327c;   /* 10.34:1 */
-  --border:        #83779c;   /*  4.13:1, clears 1.4.11 */
-  --border-soft:   #ddd8e9;   /* decorative only, never a control edge */
-  --accent:        #36255c;   /* 13.32:1 */
-  --accent-surface:#ebe4fb;
-  --focus:         #4e20b6;   /*  9.52:1 */
-  --shadow: 0 1px 2px rgba(28, 19, 47, 0.06), 0 8px 24px -12px rgba(28, 19, 47, 0.18);
+  /* ---- Semantic tokens: light ----
+     The ground is Vanilla itself: warm, paper-like, and the 60% of the
+     60/30/10. Surfaces lift off it rather than sitting flush. */
+  --bg:            #f1fec8;   /* Vanilla, unaltered */
+  --surface:       #fcfdf9;
+  --surface-sunk:  #f0f6dc;
+  --text:          #1c1a23;   /* 16.83:1 on surface */
+  --text-2:        #4f4b63;   /*  8.16:1 */
+  --border:        #88849a;   /*  3.54:1, clears 1.4.11 */
+  --border-soft:   #c9c7d1;   /* decorative only, never a control edge */
+  --accent:        #23212c;   /* Cosmic, 15.51:1 */
+  --accent-surface:#eff9d2;
+  --focus:         #322277;   /* 12.61:1 */
+  --shadow: 0 1px 2px rgba(35, 33, 44, 0.07), 0 8px 24px -12px rgba(35, 33, 44, 0.22);
 
   /* ---- Signal. Official NSW RFS colours. Never restyled. ---- */
   --level-emergency-warning: #c8102e;
@@ -98,36 +103,36 @@
    unchanged because their meaning is not ours to adjust. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:            #120c1f;
-    --surface:       #1f1535;
-    --surface-sunk:  #0c0814;
-    --text:          #f3f1f9;   /* 15.42:1 on surface */
-    --text-2:        #b9acd7;   /*  8.17:1 */
-    --border:        #705f95;   /*  3.09:1 */
-    --border-soft:   #3d3451;
-    --accent:        #d2c3f6;   /* 10.58:1 */
-    --accent-surface:#2f2050;
-    --focus:         #d2c3f6;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
-    --level-not-applicable: #9083af;
-    --level-not-applicable-ink: #120c1f;
+    --bg:            #111016;
+    --surface:       #1f1e27;
+    --surface-sunk:  #0a0a0d;
+    --text:          #f6f9eb;   /* 15.45:1 on surface */
+    --text-2:        #c7d1a9;   /* 10.31:1 */
+    --border:        #6e6a81;   /*  3.17:1 */
+    --border-soft:   #3e3c49;
+    --accent:        #f1fec8;   /* Vanilla, 15.51:1 */
+    --accent-surface:#333040;
+    --focus:         #f1fec8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 8px 24px -12px rgba(0, 0, 0, 0.75);
+    --level-not-applicable: #8f8b9e;
+    --level-not-applicable-ink: #111016;
   }
 }
 
 :root[data-theme="dark"] {
-  --bg:            #120c1f;
-  --surface:       #1f1535;
-  --surface-sunk:  #0c0814;
-  --text:          #f3f1f9;
-  --text-2:        #b9acd7;
-  --border:        #705f95;
-  --border-soft:   #3d3451;
-  --accent:        #d2c3f6;
-  --accent-surface:#2f2050;
-  --focus:         #d2c3f6;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
-  --level-not-applicable: #9083af;
-  --level-not-applicable-ink: #120c1f;
+  --bg:            #111016;
+  --surface:       #1f1e27;
+  --surface-sunk:  #0a0a0d;
+  --text:          #f6f9eb;
+  --text-2:        #c7d1a9;
+  --border:        #6e6a81;
+  --border-soft:   #3e3c49;
+  --accent:        #f1fec8;
+  --accent-surface:#333040;
+  --focus:         #f1fec8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 8px 24px -12px rgba(0, 0, 0, 0.75);
+  --level-not-applicable: #8f8b9e;
+  --level-not-applicable-ink: #111016;
 }
 
 /* Text size scales the whole ramp and every tap target together. */
@@ -618,7 +623,7 @@ p { margin: 0 0 var(--space-2); }
   --accent-level-ink: var(--level-advice-ink);
   margin-inline: calc(var(--space-3) * -1);
   margin-bottom: var(--space-4);
-  background: var(--surface);
+  background: var(--bg);
 }
 
 .emergency--emergency-warning {
@@ -738,7 +743,7 @@ p { margin: 0 0 var(--space-2); }
   padding: var(--space-3);
   padding-inline: max(var(--space-3), env(safe-area-inset-left));
   padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
-  background: var(--surface);
+  background: var(--bg);
   border-top: 1px solid var(--border-soft);
 }
 
@@ -775,7 +780,7 @@ p { margin: 0 0 var(--space-2); }
 .message__part { padding: var(--space-3); }
 
 .message__part--official {
-  background: var(--surface-sunk);
+  background: var(--surface);
   border: 0;
   border-inline-start: 3px solid var(--text-2);
   border-radius: 0;
@@ -784,12 +789,14 @@ p { margin: 0 0 var(--space-2); }
 .message__part--explanation {
   background: var(--surface);
   border: 0;
-  border-inline-start: 3px dashed var(--accent);
+  border-top: 1px solid var(--border-soft);
+  border-inline-start: 3px dashed var(--border);
 }
 
 .message__part--source {
   background: var(--surface);
   border: 0;
+  border-top: 1px solid var(--border-soft);
   border-inline-start: 3px solid var(--border-soft);
 }
 
@@ -1601,6 +1608,12 @@ p { margin: 0 0 var(--space-2); }
      from under the pin. */
   perspective: 760px;
   perspective-origin: 50% 50%;
+  /* Dragging sets this. It starts at a readable angle and is clamped so
+     the plane can never be turned edge-on and made useless. */
+  --pd-tilt: 46deg;
+  touch-action: none;
+  cursor: grab;
+  border-radius: var(--radius);
   /* The tilt leaves unused height above and below. Pulling the box in is
      honest; overflowing the SVG upward ran it into the text above. */
   margin-block: calc(var(--space-4) * -1);
@@ -1611,8 +1624,8 @@ p { margin: 0 0 var(--space-2); }
   height: 100%;
   overflow: visible;
   /* Shallow enough to stay readable as a plan, steep enough to read as a
-     floor. Past about 50deg it collapses into a thin ellipse. */
-  transform: rotateX(46deg);
+     floor. Driven by the drag, clamped in the component. */
+  transform: rotateX(var(--pd-tilt));
   transform-style: preserve-3d;
 }
 
@@ -1665,6 +1678,13 @@ p { margin: 0 0 var(--space-2); }
   background: linear-gradient(to bottom, var(--text) 30%, transparent);
 }
 
+.pd__stage:active { cursor: grabbing; }
+
+.pd__stage:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 6px;
+}
+
 .pd__caption {
   font-size: var(--text-sm);
   font-weight: 600;
@@ -1672,12 +1692,21 @@ p { margin: 0 0 var(--space-2); }
   text-align: center;
 }
 
-.pd--inside .pd__caption { color: var(--text); }
+.pd--inside .pd__stage:active { cursor: grabbing; }
+
+.pd__stage:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 6px;
+}
+
+.pd__caption { color: var(--text); }
 
 /* Flat, still and fully legible when motion is unwelcome. The diagram
    keeps communicating; it simply stops being dimensional. */
 @media (prefers-reduced-motion: reduce) {
-  .pd__stage { perspective: none; margin-block: 0; }
+  /* Flat, still, and not draggable: the tilt is the thing being suppressed,
+     so there is nothing left to adjust. */
+  .pd__stage { perspective: none; margin-block: 0; cursor: default; }
   .pd__svg { transform: none; }
   .pd__pin { transform: translate(-50%, -50%); }
   .pd__stem, .pd__shadow { display: none; }
