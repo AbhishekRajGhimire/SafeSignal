@@ -1717,3 +1717,25 @@ p { margin: 0 0 var(--space-2); }
 @media (max-height: 30rem) and (orientation: landscape) {
   .pd { display: none; }
 }
+
+/* ==================================================================
+   EMERGENCY TAKEOVER
+
+   At Emergency Warning and Watch and Act the screen stops being an
+   application and becomes one message. The chrome that helps when
+   nothing is happening is noise when something is.
+
+   What survives: the warning, the way to hear it, the official wording,
+   the way to get help, how fresh the data is, and who issued it.
+   ================================================================== */
+
+.screen--takeover .screen__foot {
+  margin-top: var(--space-4);
+  text-align: center;
+}
+
+/* The footer is a receipt during a takeover, not a control panel. */
+.screen--takeover .screen__foot p {
+  font-size: var(--text-xs);
+  color: var(--text-2);
+}

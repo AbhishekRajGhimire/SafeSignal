@@ -314,3 +314,32 @@ describe('the proximity diagram is a schematic, never a map', () => {
     expect(reduced).toContain('perspective: none')
   })
 })
+
+describe('the emergency takeover strips chrome but never information', () => {
+  const page = readFileSync('app/page.tsx', 'utf8')
+
+  it('triggers only at the two levels that mean act now', () => {
+    expect(page).toContain("top?.warning.level === 'emergency-warning'")
+    expect(page).toContain("top?.warning.level === 'watch-and-act'")
+  })
+
+  it('hides nearby warnings and the settings controls', () => {
+    expect(page).toContain('const others = takeover ? []')
+    expect(page).toContain('{!takeover && (')
+  })
+
+  it('keeps freshness and attribution, which a person acting needs', () => {
+    // Silent staleness is the dangerous failure, so the one thing a
+    // takeover must not remove is how old the data is.
+    const foot = page.slice(page.indexOf('screen__foot'))
+    expect(foot).toContain('pack.ui.dataAsOf')
+    expect(foot).toContain('pack.ui.sourceRfs')
+  })
+
+  it('never hides the warning, the help action or the official message', () => {
+    expect(page).toContain('<EmergencyWarning')
+    const emergency = readFileSync('components/warning/EmergencyWarning.tsx', 'utf8')
+    expect(emergency).toContain('<OfficialBlock')
+    expect(emergency).toContain('pack.ui.getHelp')
+  })
+})

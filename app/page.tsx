@@ -91,13 +91,29 @@ export default function Home() {
   }
 
   const emergency = state === 'warning' || state === 'warning-updated'
-  const others = assessment.all.filter((r) => r.verdict !== 'affected')
+
+  /**
+   * At the two levels that mean act now, the screen becomes one thing.
+   *
+   * Nearby warnings, settings and the mode toggle all disappear: they are
+   * useful when nothing is happening and they are noise when something is.
+   * Freshness and attribution stay, because a person acting on this needs
+   * to know how old it is and who issued it.
+   */
+  const takeover =
+    emergency &&
+    (top?.warning.level === 'emergency-warning' || top?.warning.level === 'watch-and-act')
+
+  const others = takeover ? [] : assessment.all.filter((r) => r.verdict !== 'affected')
 
   return (
     <>
       {demoMode && <div className="banner banner--demo">{pack.ui.demoBanner}</div>}
 
-      <main className={`screen${emergency ? ' screen--emergency' : ''}`} id="main">
+      <main
+        className={`screen${emergency ? ' screen--emergency' : ''}${takeover ? ' screen--takeover' : ''}`}
+        id="main"
+      >
         {/* The change summary is the one interruption the screen allows.
             It says what changed; it never says what to do about it. */}
         {state === 'warning-updated' && top && (
@@ -146,18 +162,21 @@ export default function Home() {
             {pack.ui.dataAsOf} {feed.fetchedAt ? clockFor(profile.language).format(feed.fetchedAt) : '—'}
           </p>
           <p className="muted">{pack.ui.sourceRfs}</p>
-          <div className="screen__actions">
-            <Link className="button button--secondary" href="/setup">
-              {pack.ui.changeSettings}
-            </Link>
-            <button
-              type="button"
-              className="button button--secondary"
-              onClick={() => setDemoMode(!demoMode)}
-            >
-              {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
-            </button>
-          </div>
+          {/* Hidden during a takeover. Nothing here helps someone act. */}
+          {!takeover && (
+            <div className="screen__actions">
+              <Link className="button button--secondary" href="/setup">
+                {pack.ui.changeSettings}
+              </Link>
+              <button
+                type="button"
+                className="button button--secondary"
+                onClick={() => setDemoMode(!demoMode)}
+              >
+                {demoMode ? pack.ui.switchToLive : pack.ui.switchToDemo}
+              </button>
+            </div>
+          )}
         </footer>
       </main>
     </>
