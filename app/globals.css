@@ -988,3 +988,12 @@ p { margin: 0 0 var(--space-2); }
 }
 
 .democtl__row .button { width: auto; flex: 1 1 auto; }
+
+/* Sub-headings inside the presenter panel: quieter than the panel title,
+   and the accessible name for each group of setting buttons. */
+.democtl__label {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--ink-secondary);
+  margin: var(--space-3) 0 var(--space-1);
+}
